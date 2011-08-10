@@ -1,0 +1,16 @@
+Package: getMODIS
+Type: Package
+Title: keaping a used-defined MODIS ftp 'mirror' and pre-processing of MODIS grid data   
+Version: 0.1
+Date: 2011-08-10
+Depends: RCurl
+Suggests: audio
+Author: Matteo Mattiuzzi
+Maintainer: Matteo Mattiuzzi <matteo@mattiuzzi.com>
+Description: User can define which MODIS data to download. Which in the sense of MODIS-PRODUCT and VERSION, AREA, PERIOD. The functions here are doing the rest by creating a userdefined subset of the online MODIS-grid archive (ftp://e4ftl01u.ecs.nasa.gov/). Installing some additional software it is possible to further process downloaded data with all their capabilities
+ - MODIS ReprojectionTool (MRT): https://lpdaac.usgs.gov/lpdaac/tools/modis_reprojection_tool
+ - LDOPE: https://lpdaac.usgs.gov/lpdaac/tools/ldope_tools
+only Windows:
+ - dos2unix ()
+License: GPL (>=3)
+LazyLoad: yes
