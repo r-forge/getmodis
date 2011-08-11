@@ -32,18 +32,18 @@ if (!missing(HdfName)){
 		
 		if (secName[length(secName)]!= "hdf"){stop(secName,"is not a good hdf HdfName")}
 					
-	PF <- substr(secName[1],1,3)
+	PF1 <- substr(secName[1],1,3)
 		
-		if (!PF %in% c("MOD","MYD")) {stop(PF,"not from TERRA or AQUA")}
+		if (!PF1 %in% c("MOD","MYD")) {stop(PF1,"not from TERRA or AQUA")}
 
-	if(PF=="MOD"){PF <- "MOLT"}else {PF <- "MOLA"}
+	if(PF1=="MOD"){PF1 <- "MOLT"}else {PF1 <- "MOLA"}
 
 	date <- substr(secName[2],2,8)
 	date <- format(as.Date(as.numeric(substr(date,5,7))-1,origin=paste(substr(date,1,4),"-01-01",sep="")),"%Y.%m.%d")
 	version <- secName[4]
 
-	arcPath <- paste(PF,"/",secName[1],".",version,"/",date,"/",sep="")
-	dir.create(paste(LocalArcPath,arcPath,sep=""),recursive=TRUE,showWarnings=FALSE) # this always generates the same structure as the original ftp (this makes sense if the local LocalArcPath becomes big!
+	arcPath <- paste(PF1,"/",secName[1],".",version,"/",date,"/",sep="")
+	dir.create(paste(LocalArcPath,arcPath,sep=""),recursive=TRUE,showWarnings=FALSE) # this always generates the same structure as the original ftp (this makes sense if the local LocalArcPath becomes big!)
 	
 		if (!file.exists(paste(LocalArcPath,arcPath,HdfName[i],sep=""))) {
 			require(RCurl)
@@ -78,9 +78,10 @@ forceFtpCheck <-  TRUE # if FTP connection doesn't work FALSE will prozess files
 PF <- substr(Product,2,2)
 
 if (PF %in% c("x","X")) { # oioioi
-	PF1  <- c("MOLT", "MOLA"); PF2  <- c("MOD", "MYD") 
+		PF1  <- c("MOLT", "MOLA"); PF2  <- c("MOD", "MYD") 
 } else {
-	if (PF %in% c("y","Y")) {PF1  <- "MOLA"; PF2 <- "MYD"
+	if (PF %in% c("y","Y")) {
+		PF1  <- "MOLA"; PF2 <- "MYD"
 	} else {
 	if (PF %in% c("o","O")) {
 		PF1  <- "MOLT"; PF2 <- "MOD"
@@ -139,15 +140,15 @@ for(z in 1:length(PF1)){ # Platforms MOD/MYD
 			if (checkXML!=TRUE) {mtr[2,] <- 0 } # if XML availability is not checked set to 0 row 2
 
 # creates local directory
-outArcPath <- paste(LocalArcPath,PF2[z],PD,".",Version,"/",dates[[z]][i,1],"/",sep="")
-dir.create(outArcPath,showWarnings=FALSE,recursive=TRUE)
+arcPath <- paste(LocalArcPath,PF2[z],PD,".",Version,"/",dates[[z]][i,1],"/",sep="")
+dir.create(arcPath,showWarnings=FALSE,recursive=TRUE)
  
 for(j in 1:ntiles){ # in one date get tiles in tileID
 
 dates[[z]][i,j+1] <- paste(PF2[z],PD[z],".",datu,".",tileID[j],".",Version,".*.hdf$",sep="") # create pattern
 	
-	if (length(dir(outArcPath,pattern=dates[[z]][i,j+1]))>0){ # if file found locally with pattern
-		HDF <- dir(outArcPath,pattern=dates[[z]][i,j+1])  # extract only the HDF file
+	if (length(dir(arcPath,pattern=dates[[z]][i,j+1]))>0){ # if file found locally with pattern
+		HDF <- dir(arcPath,pattern=dates[[z]][i,j+1])  # extract only the HDF file
 		
 		if (length(HDF)>1) {
 			select <- list()
@@ -159,7 +160,7 @@ dates[[z]][i,j+1] <- paste(PF2[z],PD[z],".",datu,".",tileID[j],".",Version,".*.h
 		dates[[z]][i,j+1] <- HDF
 
 	if(checkXML){ # if checkXML is TRUE && xml not local, it is downloaded here
-		xml <- getXML(HdfName = paste(outArcPath,dates[[z]][i,j+1],sep=""))
+		xml <- getXML(HdfName = paste(arcPath,dates[[z]][i,j+1],sep=""))
 		mtr[2,j] <- xml # value returned from getXML is 0 (download.file() success) 
 		}
 	}
@@ -183,10 +184,12 @@ if (sum(mtr)!=0) {
 					}
 				dates[[z]][i,j+1] <- HDF
 			
-			if(mtr[1,j]==1 & length(HDF)==1){hdf <- download.file(paste(ftps[z], dates[[z]][i,1], "/", HDF,sep=""), destfile=paste(outArcPath, HDF, sep=""), mode='wb', method='wget', quiet=quiet, cacheOK=FALSE)
-			mtr[1,j] <- hdf}
+			if(mtr[1,j]==1 & length(HDF)==1){hdf <- download.file(paste(ftps[z], dates[[z]][i,1], "/", HDF,sep=""), destfile=paste(arcPath, HDF, sep=""), mode='wb', method='wget', quiet=quiet, cacheOK=FALSE)
+			mtr[1,j] <- hdf
+			wait(wait)
+			}
 			
-			if(checkXML){xml <-  getXML(HdfName = paste(outArcPath,dates[[z]][i,j+1],sep=""),wait=wait)
+			if(checkXML){xml <-  getXML(HdfName = paste(arcPath,dates[[z]][i,j+1],sep=""),wait=wait)
 				mtr[2,j] <- xml # value returned from getXML is 0 (download.file() success) 
 				} 		# if checkXML is TRUE && xml not local, it is downloaded
 	
@@ -195,7 +198,7 @@ if (sum(mtr)!=0) {
 	} else {dates[[z]][i,(j+1):ncol(dates[[z]])] <- "no files for that date on FTP"} # on ftp is possible to find empty folders!
 }
 dir.create(paste(LocalArcPath,"LOGS/",sep=""),showWarnings=FALSE)	
-write.csv(dates[[z]],file=paste(outArcPath,"LOGS/",PF2[z],PD,"_CECK.csv",sep=""))
+write.csv(dates[[z]],file=paste(arcPath,"LOGS/",PF2[z],PD,"_CECK.csv",sep=""))
 } # end dates i 
 } # end Platform z
 } # end if not file 
