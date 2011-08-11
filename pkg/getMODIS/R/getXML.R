@@ -1,5 +1,5 @@
 
-getXML <- function(LocalPathToHdf="",HdfName="", wait=2, comments=FALSE){
+getXML <- function(LocalPathToHdf="",HdfName="", wait=1, comments=FALSE){
 
 ###################
 if (LocalPathToHdf!=""){
@@ -22,6 +22,8 @@ if(HdfName!="") {
 		}
 	}
 	
+	 # TODO, chase where only a xml is downloaded witout having the hdf
+	 
 avFiles <- unlist(avFiles)
 } else {
 avFiles <- list.files(LocalPathToHdf,pattern=".hdf$",recursive=TRUE,full.names=TRUE) # all hdf under the 'LocalPathToHdf'
@@ -40,10 +42,12 @@ success <- rep(NA,length(avFiles))
 	PF <- substr(secName[1],1,3)
 
 	# check if it is MODIS-grid File
-	Acheck <- substr(secName[2],1,1)
 	Tpat <- "h[0-3][0-9]v[0-1][0-9]" # to enhance
 
-	if (sum((!grep(secName[3],pattern=Tpat)) +  (Acheck == "A") +  (PF %in% c("MOD","MYD")) + (length(secName)!=6) ) == 4) {
+	if (sum((grep(secName[3],pattern=Tpat)) +  
+		(substr(secName[2],1,1) == "A") +  
+		(PF %in% c("MOD","MYD")) + 
+		(length(secName)==6)) == 4) {
 				
 
 	if ( !file.exists(paste(avFiles[u],".xml",sep="")) || # if xml-file doesn't exists 

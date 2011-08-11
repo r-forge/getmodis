@@ -6,7 +6,7 @@ Mirroing corresponding xml-metadata-files for any MODIS-hdf files in the query.
 }
 \description{Each MODIS HDF file has a xml-metafile. This data contains usefull information about each MODIS-hdf file. Within that package, the xml-files are used to check the size of the downloaded hdf files, and correcting the so often broken downloads from the MODIS online archive. getXML checks localy for the presense of spezified xml files and if not available it retrieves them from the MODIS ftp server.}
 
-\usage{getXML(LocalPathToHdf = "", HdfName = "", wait = 2,comments=FALSE)}
+\usage{getXML(LocalPathToHdf = "", HdfName = "", wait = 1,comments=FALSE)}
 
 \arguments{
 
