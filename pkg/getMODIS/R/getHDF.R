@@ -5,7 +5,7 @@
 
 # TODO arcPath: 'simple' files are stored by Product, 'complex' files are stored in ftp-like structure
   
-getHDF <- function(LocalArcPath,HdfName,Product,startdate,enddate,tileID,quiet=TRUE,wait=1,checkXML=FALSE,...) {
+getHDF <- function(LocalArcPath,HdfName,Product,startdate,enddate,tileID,Version,quiet=TRUE,wait=1,checkXML=FALSE,...) {
 
 if (missing(LocalArcPath)) {
 	if (.Platform$OS.type == "unix") {
@@ -169,7 +169,7 @@ if (sum(mtr)!=0) {
 	require(RCurl)
 	ftpfiles <- strsplit(getURL(paste(ftps[z], dates[[z]][i,1], "/", sep="")), if(.Platform$OS.type=="unix"){"\n"} else{"\r\n"})[[1]] # get HDF in dates[[z]][i,] 
 	if (ftpfiles[1] != "total 0") {ftpfiles <- unlist(lapply(strsplit(ftpfiles," "),function(x){x[length(x)]})) # found empty dir!
-		for(j in 1:ntiles){ ### MATTEEEEEEEOOO THINK AGAIN ON THAT!!!
+		for(j in 1:ntiles){
 			if(sum(mtr[,j])!=0){
 				onFtp <- grep(ftpfiles,pattern=dates[[z]][i,j+1],value=T)
 				HDF   <- grep(onFtp,pattern=".hdf$",value=T)
@@ -192,8 +192,9 @@ if (sum(mtr)!=0) {
 			}
 		}
 	} else {dates[[z]][i,(j+1):ncol(dates[[z]])] <- "no files for that date on FTP"} # on ftp is possible to find empty folders!
-}	
-write.csv(dates[[z]],file=paste(outArcPath,"/LOGS/",PF2[z],PD,"_CECK.csv",sep=""))
+}
+dir.create(paste(outArcPath,"LOGS/",showWarnings=FALSE)	
+write.csv(dates[[z]],file=paste(outArcPath,"LOGS/",PF2[z],PD,"_CECK.csv",sep=""))
 } # end dates i 
 } # end Platform z
 } # end if not file 
