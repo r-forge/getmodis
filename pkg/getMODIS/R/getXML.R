@@ -5,26 +5,31 @@ getXML <- function(LocalPathToHdf="",HdfName="", wait=2, comments=FALSE){
 if (LocalPathToHdf!=""){
 LocalPathToHdf <- path.expand(LocalPathToHdf)
 } else {
-LocalPathToHdf <- "." # getwd()  # probably not needed because of default
+LocalPathToHdf <- "."
 }
 
 if(HdfName!="") {
-HdfName <- unlist(HdfName)
-avFiles <- list()
-for ( i in seq(length(HdfName))){
-if (file.exists(HdfName[i])) {
-avFiles[[i]] <- HdfName[i] # if exists than HdfName is a path+File+itexists 
-} else {
-avFiles[[i]] <- list.files(LocalPathToHdf,pattern=HdfName[i],recursive=TRUE,full.names=TRUE)
-avFiles[[i]] <- grep(avFiles[[i]], pattern=".hdf$",value=TRUE) # removes xml files from list 
-}
-}
+	
+	HdfName <- unlist(HdfName)
+	avFiles <- list()
+	
+	for (i in seq(length(HdfName))){
+		if (file.exists(HdfName[i])) { # if exists than HdfName is a path+File+itexists
+		avFiles[[i]] <- HdfName[i] 
+		} else {
+		avFiles[[i]] <- list.files(LocalPathToHdf,pattern=HdfName[i],recursive=TRUE,full.names=TRUE)
+		avFiles[[i]] <- grep(avFiles[[i]], pattern=".hdf$",value=TRUE) # removes xml files from list 
+		}
+	}
+	
 avFiles <- unlist(avFiles)
 } else {
-avFiles <- list.files(LocalPathToHdf,pattern=".hdf$",recursive=TRUE,full.names=TRUE) # all hdf under the home dir...
+avFiles <- list.files(LocalPathToHdf,pattern=".hdf$",recursive=TRUE,full.names=TRUE) # all hdf under the 'LocalPathToHdf'
 }
 
-if(length(avFiles)==0) {return(cat("No files to download\n"))} else {
+
+if(length(avFiles)==0) {return(cat("No files to download\n"))} else { # handle situation where only Non supported Grid-HDFs are stored
+
 
 success <- rep(NA,length(avFiles))
     for (u in seq(along=avFiles)){
