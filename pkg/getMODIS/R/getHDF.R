@@ -5,15 +5,15 @@
 
 # TODO arcPath: 'simple' files are stored by Product, 'complex' files are stored in ftp-like structure
   
-getHDF <- function(LocalArcPath,HdfName,Product,startdate,enddate,tileID,Version,quiet=TRUE,wait=1,checkXML=FALSE,...) {
+getHDF <- function(LocalArcPath,HdfName,Product,startdate,enddate,tileID,Version,quiet=TRUE,wait=1,checkXML=FALSE) {
 
 if (missing(LocalArcPath)) {
 	if (.Platform$OS.type == "unix") {
 		LocalArcPath <- "~/"
 		LocalArcPath <- path.expand(LocalArcPath)
 		LocalArcPath <- paste(LocalArcPath,"MODIS_ARC/",sep="")
-		dir.create(paste(LocalArcPath,"MODIS_ARC",sep=""),showWarnings=FALSE)
-		cat(paste("No arichve path set, using/creating standard archive in: ",LocalArcPath,"\n",sep=""))
+		dir.create(LocalArcPath,showWarnings=FALSE)
+		cat(paste("\n No arichve path set, using/creating standard archive in: ",LocalArcPath,"\n\n",sep=""))
 		flush.console()
 		} else {
 		stop("'LocalArcPath' not set properly")
@@ -80,20 +80,21 @@ PF <- substr(Product,2,2)
 if (PF %in% c("x","X")) { # oioioi
 	PF1  <- c("MOLT", "MOLA"); PF2  <- c("MOD", "MYD") 
 } else {
-	if (PF %in% c("y","Y")) {PF1  <- "MOLA"; PF2  <-"MYD"
+	if (PF %in% c("y","Y")) {PF1  <- "MOLA"; PF2 <- "MYD"
 	} else {
-	if (PF %in% c("o","O")) {PF1  <- "MOLT"; PF2  <-"MOD"
+	if (PF %in% c("o","O")) {
+		PF1  <- "MOLT"; PF2 <- "MOD"
 		} else {
-	stop("check 'Product', the Platform spezific part seams to be wrong. Not in 'MOD','MYD','MXD' ")}
+		stop("check 'Product', the Platform spezific part seams to be wrong. Not one of 'MOD','MYD','MXD'. ")
+		}
 	}
 } 
-
 
 
 # Check Product
 PD <- substr(Product,4,7)
 
-if (!PD %in% c("13Q1", "09A1","09GA","09GQ", "09Q1")) { stop("at the moment supported only '13Q1', '09A1','09GA','09GQ', '09Q1', it easy to add other just tell me!")} 
+if (!PD %in% c("13Q1", "09A1","09GA","09GQ", "09Q1")) { stop("at the moment supported only '13Q1', '09A1','09GA','09GQ', '09Q1', its easy to add other just tell me!")} 
 
 ### FTP-Dir composition
 ftps <- rep(NA,length(PF1))
@@ -112,13 +113,12 @@ end     <- as.Date(enddate,format="%Y.%m.%d")
 tileID <- unlist(tileID)
 ntiles <- length(tileID)
 
-
 dirALL <- list()
 dates  <- list()
 
 for(z in 1:length(PF1)){ # Platforms MOD/MYD
-	require(RCurl) # the function doesn't start if it isn't able to check the ftpserver on entrering... TODO force FTPcheck=FALSE
-	FtpDayDirs  <- strsplit(getURL(ftps[z]), "\n")[[1]] # its important to minimise getURL queries, every check = risk of FTP "breack" + takes its time!
+	require(RCurl) # the function doesn't start if it isn't able to check the ftpserver on entering... TODO force FTPcheck=FALSE
+	FtpDayDirs  <- strsplit(getURL(ftps[z]), "\n")[[1]] # its important to minimise getURL() queries, every check = risk of FTP breack + much time!
 	FtpDayDirs <- FtpDayDirs[substr(FtpDayDirs, 1, 1)=='d'] # removes not usable folders i.e the first: "total 34128" 
 	dirALL[[z]] <- unlist(lapply(strsplit(FtpDayDirs, " "), function(x){x[length(x)]})) # dir name below ftps[z]
 
@@ -136,6 +136,7 @@ for(z in 1:length(PF1)){ # Platforms MOD/MYD
 		doy  <- sprintf("%03d",doy)
 		datu <- paste("A",year,doy,sep="")
 		mtr  <- matrix(1,ncol=ntiles,nrow=2) # for file situation flaging
+			if (checkXML!=TRUE) {mtr[2,] <- 0 } # if XML availability is not checked set to 0 row 2
 
 # creates local directory
 outArcPath <- paste(LocalArcPath,PF2[z],PD,".",Version,"/",dates[[z]][i,1],"/",sep="")
@@ -176,7 +177,7 @@ if (sum(mtr)!=0) {
 					if (length(HDF)>1) {
 						select <- list()
 						for (d in 1:length(HDF)){ # in very new files often there are more than 1 file/tile if so: 
-							select[[d]]<- strsplit(HDF[d],"\\.")[[1]][5] #"....YYYYDDDxxx.hdf" which.max gets the last processed!
+							select[[d]]<- strsplit(HDF[d],"\\.")[[1]][5] #"....YYYYDDDxxx.hdf" which.max gets the last processed! (I hope it is ok!)
 						}
 					HDF <- HDF[which.max(unlist(select))]		
 					}
@@ -186,14 +187,14 @@ if (sum(mtr)!=0) {
 			mtr[1,j] <- hdf}
 			
 			if(checkXML){xml <-  getXML(HdfName = paste(outArcPath,dates[[z]][i,j+1],sep=""),wait=wait)
-			mtr[2,j] <- xml # value returned from getXML is 0 (download.file() success) 
-			} 		# if checkXML is TRUE && xml not local, it is downloaded
+				mtr[2,j] <- xml # value returned from getXML is 0 (download.file() success) 
+				} 		# if checkXML is TRUE && xml not local, it is downloaded
 	
 			}
 		}
 	} else {dates[[z]][i,(j+1):ncol(dates[[z]])] <- "no files for that date on FTP"} # on ftp is possible to find empty folders!
 }
-dir.create(paste(outArcPath,"LOGS/",showWarnings=FALSE)	
+dir.create(paste(LocalArcPath,"LOGS/",sep=""),showWarnings=FALSE)	
 write.csv(dates[[z]],file=paste(outArcPath,"LOGS/",PF2[z],PD,"_CECK.csv",sep=""))
 } # end dates i 
 } # end Platform z
