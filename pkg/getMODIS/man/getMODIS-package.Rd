@@ -3,16 +3,14 @@
 \alias{getMODIS}
 \docType{package}
 
-\title{Functions for MODIS data download and local storage. Pre-processing routines (cropping, reprojecting, mosaicing,...).}
+\title{Functions for MODIS-GRID-data download and local storage. Plus pre-processing routines (cropping, reprojecting, mosaicing,...).}
 
-\description{
-Description: Functions for partial mirroring of the MODIS-ftp data storage (\url{ftp://e4ftl01u.ecs.nasa.gov/}).
-With simple parameters (or Parameterfile) one can select: MODIS-PRODUCT, COLLECTION, AREA, PERIOD to download and store locally. The functions here are doing the rest: Check if file(s) is already stored locally, if not download the needed file(s), creating a archive structure like the online storage or a simplefied one.\cr
+\description{Functions for selective mirroring of the global MODIS-ftp data pool (\url{ftp://e4ftl01u.ecs.nasa.gov/}). Simple parameters are defining: MODIS-PRODUCT, COLLECTION, AREA and PERIOD. The functions are performing the following tasks: if not existing it creates a local archive structure equivalent to the online storage (or a simplified structure), checks if files are already stored locally, if not download the needed file(s).\cr
 
-Installing some additional software it is possible to further process downloaded data usin all the functions (not yet implemented!):\cr\cr
+Installing some additional software it is possible to further process downloaded data using all the functions (not yet implemented!):\cr\cr
 - MODIS ReprojectionTool (MRT): format conversion, mosaicing, SDS-extraction, reprojection, resampling. (\url{https://lpdaac.usgs.gov/lpdaac/tools/modis_reprojection_tool})\cr\cr
 - LDOPE: format conversion, SDS-extraction, bit-extraction,...(\url{https://lpdaac.usgs.gov/lpdaac/tools/ldope_tools})\cr\cr
-(only for Windows: - dos2unix (), not ready!)
+Windows: coming soon
 }
 
 \details{
@@ -26,21 +24,13 @@ LazyLoad: \tab yes\cr
 }
 }
 \author{
-Matteo Mattiuzzi; Institute of Surveying, Remote Sensing and Land Information (IVFL), Vienna 
+Matteo Mattiuzzi; Institute of Surveying, Remote Sensing and Land Information (IVFL), BOKU Vienna 
 
 Maintainer: Matteo Mattiuzzi \email{matteo@mattiuzzi.com}
 }
 
 \references{
-not yet
+TODO MODIS stuff
 }
-
 \keyword{ package }
-\seealso{
-not yet
-}
-\examples{
-# getHDF()
-# getXML() 
-}
 

@@ -60,6 +60,7 @@ if (!missing(HdfName)){
 			}
 
 		}
+		if(checkXML){getXML(HdfName = HdfName[i])}
 	}
 cat("downloaded: ",HdfName[i],"\n")
 

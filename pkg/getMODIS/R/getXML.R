@@ -29,6 +29,25 @@ avFiles <- unlist(avFiles)
 avFiles <- list.files(LocalArcPath,pattern=".hdf$",recursive=TRUE,full.names=TRUE) # all hdf under the 'LocalPathToHdf'
 }
 
+doit <- sapply(avFiles,function(x) {
+	name <- strsplit(x,"/")[[1]] # separate name from path
+	name <- name[length(name)] # select filename
+	secName  <- strsplit(name,"\\.")[[1]] # decompose filename
+	PF <- substr(secName[1],1,3)
+	
+	# check if it is MODIS-grid File
+	Tpat <- "h[0-3][0-9]v[0-1][0-9]" # to enhance
+
+	if (sum((grep(secName[3],pattern=Tpat)) +  
+		(substr(secName[2],1,1) == "A") +  
+		(PF %in% c("MOD","MYD")) + 
+		(length(secName)==6)) == 4){res <- 1} else {res <- 0}
+	return(res)}
+		)
+		
+avFiles <- avFiles[doit] 
+
+# out from here only valid MODIS.GRID.HDFs should come
 
 if(length(avFiles)==0) {return(cat("No files to download\n"))} else { # handle situation where only Non supported Grid-HDFs are stored
 
@@ -40,15 +59,6 @@ success <- rep(NA,length(avFiles))
 	name <- name[length(name)] # select filename
 	secName  <- strsplit(name,"\\.")[[1]] # decompose filename
 	PF <- substr(secName[1],1,3)
-
-	# check if it is MODIS-grid File
-	Tpat <- "h[0-3][0-9]v[0-1][0-9]" # to enhance
-
-	if (sum((grep(secName[3],pattern=Tpat)) +  
-		(substr(secName[2],1,1) == "A") +  
-		(PF %in% c("MOD","MYD")) + 
-		(length(secName)==6)) == 4) {
-				
 
 	if ( !file.exists(paste(avFiles[u],".xml",sep="")) || # if xml-file doesn't exists 
 
@@ -67,25 +77,27 @@ success <- rep(NA,length(avFiles))
 
 	require(RCurl) # is it good here?
 
-	success[u] <- print(
-		download.file(
+	success[u] <- download.file(
 			paste("ftp://e4ftl01u.ecs.nasa.gov/", PF,"/",secName[1],".",version,"/",date,"/",name,".xml",sep=""),
 			destfile=paste(avFiles[u],".xml",sep=""),
 			mode='wb', method='wget', quiet=F, cacheOK=FALSE)
-		) # print
 
-		if (comments){
-			cat(paste("downloaded file: ", name,".xml\n\n",sep=""))
+		if (comments && success[u]==0){
+			cat(paste("downloaded file: '", name,".xml'\n\n",sep=""))
 			flush.console()
+		} else {
+		if (comments && success[u]!=0) { 
+			cat(paste("File: '", name,".xml' has not been downloaded successfully!\nDownload error code from 'download.file()' is:",success[u],"\n\n",sep=""))
+			flush.console()
+		 	} 
 		}
 
 		if (wait!=0){
 			require(audio) # for wait() # is it good here?
-			wait(wait) # waiting seams to decrease the chanse of ftp collapse
-			}
+			wait(as.numeric(wait)) # waiting seams to decrease the chanse of ftp collapse
+		}
 	} else {
 	success[u] <- 0}
-	}
 	} # avFiles[u] 
 return(success)
 } # if avFiles > 0
