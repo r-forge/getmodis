@@ -3,28 +3,57 @@
 \docType{methods}
 
 \alias{getXML}
-\alias{getXML,getMODIS,function-method}
+\alias{getXML,LocalArcPath,HdfName,wait}
 
-\title{Mirroring corresponding xml-metadata-files for any MODIS-grid-hdf files in the query.}
+\title{Mirroring corresponding xml-metadata-files for any MODIS-grid-hdf
+  files in the query.}
 
 \description{
-Each MODIS HDF file has a xml-metafile. This data contains usefull information about each MODIS-hdf file. Within that package, the xml-files are used to check the size of the downloaded hdf files, and correcting the so often broken downloads from the MODIS online archive. getXML checks localy for the presense of spezified xml files and if not available it retrieves them from the MODIS ftp server.}
-
-\usage{getXML(LocalArcPath="",HdfName="", wait=1)}
-
-\arguments{
-  \item{LocalArcPath}{Character. Is the path to look recursively for MODIS-HDF files. If left Blank, the standard argument \code{list.files(path=".")} is used. If \code{HdfName} is not set, all underlaying MODIS-HDF files are checked for the XML file presence. If not available locally the MODIS-XML file is downloaded.}
-
-  \item{HdfName}{Character. Is a filename or a pattern (regular expression) to check for XML file presence. If \code{HdfName} is not set all found MODIS-XML files are gathered regarding the \code{LocalArcPath} setting.}
-
-  \item{wait}{Numeric. Default \code{1}. Inserts a break (in seconds) after every internal \code{download.file()} or \code{getURL()} call. It reduces the chance of FTP connection error that often occurs after many requests. Requires the 'audio' package. Recommended values 1 to 3 seconds, the more Files higer value. (Hopefully \code{wait} is a temporary solution!)}
+  Each MODIS HDF file has a xml-metafile. This data contains usefull
+  information about each MODIS-hdf file. Within that package, the
+  xml-files are used to check the size of the downloaded hdf files, and
+  correcting the so often broken downloads from the MODIS online
+  archive. getXML checks localy for the presense of spezified xml files
+  and if not available it retrieves them from the MODIS ftp server.
 }
 
-\value{An (invisible) integer code, \code{0} for success and non-zero for failure (see: \code{?download.file}). Look in the directory where the HDF files are stored to check for XML files.}
+\usage{
+getXML(LocalArcPath="",HdfName="", wait=1)
+}
 
-\author{Matteo Mattiuzzi}
+\arguments{
+  \item{LocalArcPath}{Character. Is the path to look recursively for MODIS-HDF files. If
+  left Blank, the standard argument \code{list.files(path=".")} is
+  used. If \code{HdfName} is not set, all underlaying MODIS-HDF files
+  are checked for the XML file presence. If not available locally the
+  MODIS-XML file is downloaded.}
 
-\seealso{getHDF}
+\item{HdfName}{Character. Is a filename or a pattern (regular expression) to check
+  for XML file presence. If \code{HdfName} is not set all found
+  MODIS-XML files are gathered regarding the \code{LocalArcPath}
+  setting.}
+
+\item{wait}{Numeric. Default \code{1}. Inserts a break (in seconds) after every
+  internal \code{download.file()} or \code{getURL()} call. It reduces
+  the chance of FTP connection error that often occurs after many
+  requests. Requires the 'audio' package. Recommended values 1 to 3
+  seconds, the more Files higer value. (Hopefully \code{wait} is a
+  temporary solution!)}
+}
+
+\value{
+  An (invisible) integer code, \code{0} for success and non-zero for
+  failure (see: \code{?download.file}). Look in the directory where the
+  HDF files are stored to check for XML files.
+}
+
+\author{
+  Matteo Mattiuzzi
+}
+
+\seealso{
+  \code{\link[getMODIS]{getHDF}}
+}
 
 \examples{
 # checks all HDF files under path="." for the XML-file
