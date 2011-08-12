@@ -50,7 +50,7 @@ if (!missing(HdfName)){
 		if (!file.exists(paste(LocalArcPath,arcPath,HdfName[i],sep=""))) {
 		    require(RCurl)
 			download.file(
-				paste("ftp://e4ftl01u.ecs.nasa.gov/", arcPath,HdfName[i],sep=""),
+				paste("ftp://e4ftl01u.ecs.nasa.gov/",PF1,"/", arcPath,HdfName[i],sep=""),
 				destfile=paste(LocalArcPath, arcPath,HdfName[i],sep=""),
 				mode='wb', method='wget', quiet=quiet, cacheOK=FALSE)
 			
@@ -100,13 +100,6 @@ PD <- substr(Product,4,7)
 
 if (!PD %in% c("13Q1", "09A1","09GA","09GQ", "09Q1")) { stop("at the moment supported only '13Q1', '09A1','09GA','09GQ', '09Q1', its easy to add other just tell me!")} 
 
-### FTP-Dir composition
-ftps <- rep(NA,length(PF1))
-for (u in 1:length(PF1)){
-ftps[u] <- paste("ftp://e4ftl01u.ecs.nasa.gov/", PF1[u],"/", PF2[u],PD,".",Collection,"/",sep="")
-}
-####
-
 #### convert dates # TODO error handling
 begin   <- as.Date(startdate,format="%Y.%m.%d") 
 end     <- as.Date(enddate,format="%Y.%m.%d") 
@@ -121,10 +114,13 @@ dirALL <- list()
 dates  <- list()
 
 for(z in 1:length(PF1)){ # Platforms MOD/MYD
+
+	ftp <- paste("ftp://e4ftl01u.ecs.nasa.gov/", PF1[u],"/", PF2[u],PD,".",Collection,"/",sep="")
+
 	require(RCurl) # the function doesn't start if it isn't able to check the ftpserver on entering... TODO force FTPcheck=FALSE
-	FtpDayDirs  <- strsplit(getURL(ftps[z]), "\n")[[1]] # its important to minimise getURL() queries, every check = risk of FTP breack + much time!
+	FtpDayDirs  <- strsplit(getURL(ftp), "\n")[[1]] # its important to minimise getURL() queries, every check = risk of FTP breack + much time!
 	FtpDayDirs <- FtpDayDirs[substr(FtpDayDirs, 1, 1)=='d'] # removes not usable folders i.e the first: "total 34128" 
-	dirALL[[z]] <- unlist(lapply(strsplit(FtpDayDirs, " "), function(x){x[length(x)]})) # dir name below ftps[z]
+	dirALL[[z]] <- unlist(lapply(strsplit(FtpDayDirs, " "), function(x){x[length(x)]})) # dir name below ftp
 
 	sel <- as.Date(dirALL[[z]],format="%Y.%m.%d") # convert to date
 	us  <- sel >= begin & sel <= end
@@ -172,7 +168,7 @@ dates[[z]][i,j+1] <- paste(PF2[z],PD[z],".",datu,".",tileID[j],".",Collection,".
 # if some files are missing, its necessary to go on ftp
 if (sum(mtr)!=0) {
 	require(RCurl)
-	ftpfiles <- strsplit(getURL(paste(ftps[z], dates[[z]][i,1], "/", sep="")), if(.Platform$OS.type=="unix"){"\n"} else{"\r\n"})[[1]] # get HDF in dates[[z]][i,] 
+	ftpfiles <- strsplit(getURL(paste(ftp, dates[[z]][i,1], "/", sep="")), if(.Platform$OS.type=="unix"){"\n"} else{"\r\n"})[[1]] # get HDF in dates[[z]][i,] 
 	if (ftpfiles[1] != "total 0") {ftpfiles <- unlist(lapply(strsplit(ftpfiles," "),function(x){x[length(x)]})) # found empty dir!
 		for(j in 1:ntiles){
 			if(sum(mtr[,j])!=0){
@@ -188,7 +184,7 @@ if (sum(mtr)!=0) {
 				dates[[z]][i,j+1] <- HDF
 			
 			if(mtr[1,j]==1 & length(HDF)==1){
-				hdf <- download.file(paste(ftps[z], dates[[z]][i,1], "/", HDF,sep=""), destfile=paste(arcPath, HDF, sep=""), mode='wb', method='wget', quiet=quiet, cacheOK=FALSE)
+				hdf <- download.file(paste(ftp, dates[[z]][i,1], "/", HDF,sep=""), destfile=paste(arcPath, HDF, sep=""), mode='wb', method='wget', quiet=quiet, cacheOK=FALSE)
 				mtr[1,j] <- hdf
 				wait(wait)
 			}
