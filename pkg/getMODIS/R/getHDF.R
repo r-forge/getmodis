@@ -5,7 +5,7 @@
 
 # TODO arcPath: 'simple' files are stored by Product, 'complex' files are stored in ftp-like structure
   
-getHDF <- function(LocalArcPath,HdfName,Product,startdate,enddate,tileID,Version,quiet=TRUE,wait=1,checkXML=FALSE) {
+getHDF <- function(LocalArcPath,HdfName,Product,startdate,enddate,tileID,Version,quiet=FALSE,wait=1,checkXML=FALSE) {
 
 if (missing(LocalArcPath)) {
 	if (.Platform$OS.type == "unix") {
@@ -139,7 +139,7 @@ for(z in 1:length(PF1)){ # Platforms MOD/MYD
 		mtr  <- matrix(1,ncol=ntiles,nrow=2) # for file situation flaging
 			if (checkXML!=TRUE) {mtr[2,] <- 0 } # if XML availability is not checked set to 0 row 2
 
-# creates local directory
+# creates local directory (HDF file container)
 arcPath <- paste(LocalArcPath,PF2[z],PD,".",Version,"/",dates[[z]][i,1],"/",sep="")
 dir.create(arcPath,showWarnings=FALSE,recursive=TRUE)
  
@@ -198,7 +198,7 @@ if (sum(mtr)!=0) {
 	} else {dates[[z]][i,(j+1):ncol(dates[[z]])] <- "no files for that date on FTP"} # on ftp is possible to find empty folders!
 }
 dir.create(paste(LocalArcPath,"LOGS/",sep=""),showWarnings=FALSE)	
-write.csv(dates[[z]],file=paste(arcPath,"LOGS/",PF2[z],PD,"_CECK.csv",sep=""))
+write.csv(dates[[z]],file=paste(LocalArcPath,"LOGS/",PF2[z],PD,"_",Version,"_CECK.csv",sep=""))
 } # end dates i 
 } # end Platform z
 } # end if not file 
