@@ -44,7 +44,7 @@ if (!missing(HdfName)){
 	date <- format(as.Date(as.numeric(substr(date,5,7))-1,origin=paste(substr(date,1,4),"-01-01",sep="")),"%Y.%m.%d")
 	Collection <- secName[4]
 
-	arcPath <- paste(PF1,"/",secName[1],".",Collection,"/",date,"/",sep="")
+	arcPath <- paste(secName[1],".",Collection,"/",date,"/",sep="")
 	dir.create(paste(LocalArcPath,arcPath,sep=""),recursive=TRUE,showWarnings=FALSE) # this always generates the same structure as the original ftp (this makes sense if the local LocalArcPath becomes big!)
 	
 		if (!file.exists(paste(LocalArcPath,arcPath,HdfName[i],sep=""))) {
@@ -187,9 +187,10 @@ if (sum(mtr)!=0) {
 					}
 				dates[[z]][i,j+1] <- HDF
 			
-			if(mtr[1,j]==1 & length(HDF)==1){hdf <- download.file(paste(ftps[z], dates[[z]][i,1], "/", HDF,sep=""), destfile=paste(arcPath, HDF, sep=""), mode='wb', method='wget', quiet=quiet, cacheOK=FALSE)
-			mtr[1,j] <- hdf
-			wait(wait)
+			if(mtr[1,j]==1 & length(HDF)==1){
+				hdf <- download.file(paste(ftps[z], dates[[z]][i,1], "/", HDF,sep=""), destfile=paste(arcPath, HDF, sep=""), mode='wb', method='wget', quiet=quiet, cacheOK=FALSE)
+				mtr[1,j] <- hdf
+				wait(wait)
 			}
 			
 			if(checkXML){xml <-  getXML(HdfName = paste(arcPath,dates[[z]][i,j+1],sep=""),wait=wait)

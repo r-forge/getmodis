@@ -6,8 +6,8 @@ Date: 2011-08-10
 Depends: RCurl
 Suggests: audio
 Author: Matteo Mattiuzzi; Institute of Surveying, Remote Sensing and Land Information (IVFL), BOKU Vienna
-Maintainer: Matteo Mattiuzzi <matteo@mattiuzzi.com>
-Description: Functions for selective mirroring of the global MODIS-ftp data pool ('ftp://e4ftl01u.ecs.nasa.gov/'). Simple parameters are defining: MODIS-PRODUCT, COLLECTION, AREA and PERIOD. The functions are performing the following tasks: if not existing it creates a local archive structure equivalent to the online storage (or a simplified structure), checks if files are already stored locally, if not download the needed file(s). (Further processing routines will be added soon)
+Maintainer: Matteo Mattiuzzi <matteo.mattiuzzi@boku.ac.at>
+Description: Functions for selective mirroring of the global MODIS-ftp data pool ('ftp://e4ftl01u.ecs.nasa.gov/'). Simple parameters are defining: MODIS-PRODUCT, COLLECTION, AREA and PERIOD. The functions (1) create a local archive if not existing, (2) check if requested files are already stored in the local archive, (3) download missing requested file(s) including metafile(s). (Further processing routines will be added soon)
 URL: http://getmodis.r-forge.r-project.org/
 License: GPL (>=3)
 LazyLoad: yes

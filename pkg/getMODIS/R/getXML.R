@@ -1,5 +1,5 @@
 
-getXML <- function(LocalArcPath="",HdfName="", wait=1, comments=FALSE){
+getXML <- function(LocalArcPath="",HdfName="", wait=1){
 
 ###################
 if (LocalArcPath!=""){
@@ -81,16 +81,6 @@ success <- rep(NA,length(avFiles))
 			paste("ftp://e4ftl01u.ecs.nasa.gov/", PF,"/",secName[1],".",version,"/",date,"/",name,".xml",sep=""),
 			destfile=paste(avFiles[u],".xml",sep=""),
 			mode='wb', method='wget', quiet=F, cacheOK=FALSE)
-
-		if (comments && success[u]==0){
-			cat(paste("downloaded file: '", name,".xml'\n\n",sep=""))
-			flush.console()
-		} else {
-		if (comments && success[u]!=0) { 
-			cat(paste("File: '", name,".xml' has not been downloaded successfully!\nDownload error code from 'download.file()' is:",success[u],"\n\n",sep=""))
-			flush.console()
-		 	} 
-		}
 
 		if (wait!=0){
 			require(audio) # for wait() # is it good here?

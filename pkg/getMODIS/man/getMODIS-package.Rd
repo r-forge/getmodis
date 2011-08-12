@@ -26,11 +26,11 @@ LazyLoad: \tab yes\cr
 \author{
 Matteo Mattiuzzi; Institute of Surveying, Remote Sensing and Land Information (IVFL), BOKU Vienna 
 
-Maintainer: Matteo Mattiuzzi \email{matteo@mattiuzzi.com}
+Maintainer: Matteo Mattiuzzi \email{matteo.mattiuzzi@boku.ac.at}
 }
 
 \references{
-TODO MODIS stuff
+TODO, MODIS stuff
 }
-\keyword{ package }
+\keyword{MODIS, time series}
 

@@ -10,32 +10,30 @@
 \description{
 Each MODIS HDF file has a xml-metafile. This data contains usefull information about each MODIS-hdf file. Within that package, the xml-files are used to check the size of the downloaded hdf files, and correcting the so often broken downloads from the MODIS online archive. getXML checks localy for the presense of spezified xml files and if not available it retrieves them from the MODIS ftp server.}
 
-\usage{getXML(LocalArcPath="",HdfName="", wait=1, comments=FALSE)}
+\usage{getXML(LocalArcPath="",HdfName="", wait=1)}
 
 \arguments{
+  \item{LocalArcPath}{Character. Is the path to look recursively for MODIS-HDF files. If left Blank, the standard argument \code{list.files(path=".")} is used. If \code{HdfName} is not set, all underlaying MODIS-HDF files are checked for the XML file presence. If not available locally the MODIS-XML file is downloaded.}
 
-  \item{LocalArcPath}{Is the path to look for MODIS-hdf files. If left Blank, the standard argument \code{list.files(path=".")} is used. If 'HdfName' is not set, all underlaying MODIS-hdf files are checked for the xml presence and aquired if not available locally.}
+  \item{HdfName}{Character. Is a filename or a pattern (regular expression) to check for XML file presence. If \code{HdfName} is not set all found MODIS-XML files are gathered regarding the \code{LocalArcPath} setting.}
 
-  \item{HdfName}{Is a Filename or a pattern (regular expression) to check for xml file presens. If \code{HdfName} is not set all found MODIS-hdf files are gathered.}
-
-  \item{wait}{is a little addition from package 'audio'. After a xml file has been downloaded (with \code{download.file()}) the function waits for the here defined time (default is 1 second. Set to 0 and library 'audio' will not be loaded!). The problem is that MODIS ftp archive often refuses the connection, inserting a little 'wait' the connection is much more stable. Recomanded values 1 to 3 secounds, you can set it in proportion with the amount of files. More Files higer value. (I'll try to solve the sproblem in a more elegant way soon)}
-
-  \item{comments}{Should getXML report the downloaded file?}
+  \item{wait}{Numeric. Default \code{1}. Inserts a break (in seconds) after every internal \code{download.file()} or \code{getURL()} call. It reduces the chance of FTP connection error that often occurs after many requests. Requires the 'audio' package. Recommended values 1 to 3 seconds, the more Files higer value. (Hopefully \code{wait} is a temporary solution!)}
 }
 
-\value{none; look in the directory where the hdf files are stored to check for new xml files}
+\value{An (invisible) integer code, \code{0} for success and non-zero for failure (see: \code{?download.file}). Look in the directory where the HDF files are stored to check for XML files.}
 
 \author{Matteo Mattiuzzi}
 
 \seealso{getHDF}
 
 \examples{
+# checks all HDF files under path="." for the XML-file
+# getXML()
 
-# getXML() # checks all HDF files under path="." for the xml-file
+# check all MODIS Terra Vegetation Indices 250 m (13Q1) under "."
+# getXML(HdfName="MOD13Q1*")
 
-# getXML(HdfName="MOD13Q1*") # check all MODIS Terra Vegetation indices 250 m (13Q1) under "."
-
-# getXML(HdfName="MYD09GA.A2011002.h19v05.005.2011007211429.hdf") # checks the xml availability of the given file
-
+# checks the XML file availability for a single file
+# getXML(HdfName="MYD09GA.A2011002.h19v05.005.2011007211429.hdf")
 }
 
