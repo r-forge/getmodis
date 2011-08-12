@@ -1,13 +1,12 @@
 Package: getMODIS
-Type: Package
-Title: Creating or updating a local user-defined subsets of the global MODIS grid data online archive. Plus pre-processing functionalities for MODIS grid data.  
 Version: 0.1
 Date: 2011-08-10
+Title: Creating or updating a local user-defined subsets of the global MODIS grid data online archive. Plus pre-processing functionalities for MODIS grid data.  
 Depends: RCurl
 Suggests: audio
 Author: Matteo Mattiuzzi; Institute of Surveying, Remote Sensing and Land Information (IVFL), BOKU Vienna
 Maintainer: Matteo Mattiuzzi <matteo.mattiuzzi@boku.ac.at>
-Description: Functions for selective mirroring of the global MODIS-ftp data pool ('ftp://e4ftl01u.ecs.nasa.gov/'). Simple parameters are defining: MODIS-PRODUCT, COLLECTION, AREA and PERIOD. The functions (1) create a local archive if it is not existing, (2) check if requested files are already stored in the local archive, (3) download missing file(s) including metafile(s). (Further processing routines will be added soon)
+Description:	Functions for selective mirroring of the global MODIS-ftp data pool ('ftp://e4ftl01u.ecs.nasa.gov/'). Simple parameters are defining: MODIS-PRODUCT, COLLECTION, AREA and PERIOD. The functions (1) create a local archive if it is not existing, (2) check if requested files are already stored in the local archive, (3) download missing file(s) including metafile(s). (Further processing routines will be added soon)
 URL: http://getmodis.r-forge.r-project.org/
 License: GPL (>=3)
 LazyLoad: yes

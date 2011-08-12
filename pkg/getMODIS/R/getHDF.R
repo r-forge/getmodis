@@ -115,7 +115,7 @@ dates  <- list()
 
 for(z in 1:length(PF1)){ # Platforms MOD/MYD
 
-	ftp <- paste("ftp://e4ftl01u.ecs.nasa.gov/", PF1[u],"/", PF2[u],PD,".",Collection,"/",sep="")
+	ftp <- paste("ftp://e4ftl01u.ecs.nasa.gov/", PF1[z],"/", PF2[z],PD,".",Collection,"/",sep="")
 
 	require(RCurl) # the function doesn't start if it isn't able to check the ftpserver on entering... TODO force FTPcheck=FALSE
 	FtpDayDirs  <- strsplit(getURL(ftp), "\n")[[1]] # its important to minimise getURL() queries, every check = risk of FTP breack + much time!
