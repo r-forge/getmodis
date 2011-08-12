@@ -5,7 +5,7 @@
 
 # TODO arcPath: 'simple' files are stored by Product, 'complex' files are stored in ftp-like structure
   
-getHDF <- function(LocalArcPath,HdfName,Product,startdate,enddate,tileID,Version,quiet=FALSE,wait=1,checkXML=FALSE) {
+getHDF <- function(LocalArcPath,HdfName,Product,startdate,enddate,tileID,Collection,quiet=FALSE,wait=1,checkXML=FALSE) {
 
 if (missing(LocalArcPath)) {
 	if (.Platform$OS.type == "unix") {
@@ -23,7 +23,9 @@ if (missing(LocalArcPath)) {
 try(testDir <- list.dirs(LocalArcPath),silent=TRUE)
 	if(!exists("testDir")) {stop("'LocalArcPath' not set properly")} 
 #################
+
 # if filename is provided other args are ignored (filename is ok for not too many files (because of high ftp-request frequency)
+
 if (!missing(HdfName)){ 
 	HdfName <- unlist(HdfName)
 	for (i in seq(along=HdfName)){
@@ -32,27 +34,27 @@ if (!missing(HdfName)){
 		
 		if (secName[length(secName)]!= "hdf"){stop(secName,"is not a good hdf HdfName")}
 					
-	PF1 <- substr(secName[1],1,3)
+	PF <- substr(secName[1],1,3)
 		
-		if (!PF1 %in% c("MOD","MYD")) {stop(PF1,"not from TERRA or AQUA")}
+		if (!PF %in% c("MOD","MYD")) {stop(PF," not from TERRA or AQUA")}
 
-	if(PF1=="MOD"){PF1 <- "MOLT"}else {PF1 <- "MOLA"}
+	if(PF == "MOD"){PF1 <- "MOLT"} else {PF1 <- "MOLA"}
 
 	date <- substr(secName[2],2,8)
 	date <- format(as.Date(as.numeric(substr(date,5,7))-1,origin=paste(substr(date,1,4),"-01-01",sep="")),"%Y.%m.%d")
-	version <- secName[4]
+	Collection <- secName[4]
 
-	arcPath <- paste(PF1,"/",secName[1],".",version,"/",date,"/",sep="")
+	arcPath <- paste(PF1,"/",secName[1],".",Collection,"/",date,"/",sep="")
 	dir.create(paste(LocalArcPath,arcPath,sep=""),recursive=TRUE,showWarnings=FALSE) # this always generates the same structure as the original ftp (this makes sense if the local LocalArcPath becomes big!)
 	
 		if (!file.exists(paste(LocalArcPath,arcPath,HdfName[i],sep=""))) {
-			require(RCurl)
+		    require(RCurl)
 			download.file(
 				paste("ftp://e4ftl01u.ecs.nasa.gov/", arcPath,HdfName[i],sep=""),
 				destfile=paste(LocalArcPath, arcPath,HdfName[i],sep=""),
 				mode='wb', method='wget', quiet=quiet, cacheOK=FALSE)
 			
-			if (!missing(wait) && wait!=0) {
+			if (wait!=0) {
 				require(audio)
 				wait(wait)				
 			}
@@ -67,7 +69,7 @@ if (missing(startdate)) {stop("Please provide a 'startdate' (format: 'YYYY.MM.DD
 if (missing(enddate))   {stop("Please provide a 'endate' (format: 'YYYY.MM.DD')")} 
 if (missing(tileID))    {stop("Please provide the 'tileID(s)' ('hXXvXX')")} 
 if (missing(Product))   {stop("Please provide the MODIS-'Product'")}
-if (missing(Version))   {stop("Please provide a Product-'Version' (probably: '005')")} 
+if (missing(Collection))   {stop("Please provide a Product-'Collection' (probably: '005')")} 
 
 
 # following variables will be activated when the packge is ready for that
@@ -100,7 +102,7 @@ if (!PD %in% c("13Q1", "09A1","09GA","09GQ", "09Q1")) { stop("at the moment supp
 ### FTP-Dir composition
 ftps <- rep(NA,length(PF1))
 for (u in 1:length(PF1)){
-ftps[u] <- paste("ftp://e4ftl01u.ecs.nasa.gov/", PF1[u],"/", PF2[u],PD,".",Version,"/",sep="")
+ftps[u] <- paste("ftp://e4ftl01u.ecs.nasa.gov/", PF1[u],"/", PF2[u],PD,".",Collection,"/",sep="")
 }
 ####
 
@@ -140,12 +142,12 @@ for(z in 1:length(PF1)){ # Platforms MOD/MYD
 			if (checkXML!=TRUE) {mtr[2,] <- 0 } # if XML availability is not checked set to 0 row 2
 
 # creates local directory (HDF file container)
-arcPath <- paste(LocalArcPath,PF2[z],PD,".",Version,"/",dates[[z]][i,1],"/",sep="")
+arcPath <- paste(LocalArcPath,PF2[z],PD,".",Collection,"/",dates[[z]][i,1],"/",sep="")
 dir.create(arcPath,showWarnings=FALSE,recursive=TRUE)
  
 for(j in 1:ntiles){ # in one date get tiles in tileID
 
-dates[[z]][i,j+1] <- paste(PF2[z],PD[z],".",datu,".",tileID[j],".",Version,".*.hdf$",sep="") # create pattern
+dates[[z]][i,j+1] <- paste(PF2[z],PD[z],".",datu,".",tileID[j],".",Collection,".*.hdf$",sep="") # create pattern
 	
 	if (length(dir(arcPath,pattern=dates[[z]][i,j+1]))>0){ # if file found locally with pattern
 		HDF <- dir(arcPath,pattern=dates[[z]][i,j+1])  # extract only the HDF file
@@ -198,7 +200,7 @@ if (sum(mtr)!=0) {
 	} else {dates[[z]][i,(j+1):ncol(dates[[z]])] <- "no files for that date on FTP"} # on ftp is possible to find empty folders!
 }
 dir.create(paste(LocalArcPath,"LOGS/",sep=""),showWarnings=FALSE)	
-write.csv(dates[[z]],file=paste(LocalArcPath,"LOGS/",PF2[z],PD,"_",Version,"_CECK.csv",sep=""))
+write.csv(dates[[z]],file=paste(LocalArcPath,"LOGS/",PF2[z],PD,"_",Collection,"_CECK.csv",sep=""))
 } # end dates i 
 } # end Platform z
 } # end if not file 

@@ -1,11 +1,11 @@
 
-getXML <- function(LocalPathToHdf="",HdfName="", wait=1, comments=FALSE){
+getXML <- function(LocalArcPath="",HdfName="", wait=1, comments=FALSE){
 
 ###################
-if (LocalPathToHdf!=""){
-LocalPathToHdf <- path.expand(LocalPathToHdf)
+if (LocalArcPath!=""){
+LocalArcPath <- path.expand(LocalArcPath)
 } else {
-LocalPathToHdf <- "."
+LocalArcPath <- "."
 }
 
 if(HdfName!="") {
@@ -17,7 +17,7 @@ if(HdfName!="") {
 		if (file.exists(HdfName[i])) { # if exists than HdfName is a path+File+itexists
 		avFiles[[i]] <- HdfName[i] 
 		} else {
-		avFiles[[i]] <- list.files(LocalPathToHdf,pattern=HdfName[i],recursive=TRUE,full.names=TRUE)
+		avFiles[[i]] <- list.files(LocalArcPath,pattern=HdfName[i],recursive=TRUE,full.names=TRUE)
 		avFiles[[i]] <- grep(avFiles[[i]], pattern=".hdf$",value=TRUE) # removes xml files from list 
 		}
 	}
@@ -26,7 +26,7 @@ if(HdfName!="") {
 	 
 avFiles <- unlist(avFiles)
 } else {
-avFiles <- list.files(LocalPathToHdf,pattern=".hdf$",recursive=TRUE,full.names=TRUE) # all hdf under the 'LocalPathToHdf'
+avFiles <- list.files(LocalArcPath,pattern=".hdf$",recursive=TRUE,full.names=TRUE) # all hdf under the 'LocalPathToHdf'
 }
 
 
