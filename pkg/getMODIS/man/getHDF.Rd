@@ -3,7 +3,7 @@
 \docType{methods}
 
 \alias{getHDF}
-\alias{getHDF,LocalArcPath,HdfName,Product,startdate,enddate,tileID,Collection,quiet,wait,checkXML}
+\alias{getHDF,LocalArcPath,HdfName,product,startdate,enddate,tileH,tileV,collection,quiet,wait,checkXML}
 
 \title{Create or update a local, user-defined subset of the global online
   MODIS grid data pool.}
@@ -17,7 +17,7 @@
   update of local MODIS data archive.
 }
 
-\usage{getHDF(LocalArcPath,HdfName,Product,startdate,enddate,tileID,Collection,quiet=FALSE,wait=1,checkXML=FALSE)}
+\usage{getHDF(LocalArcPath,HdfName,product,startdate,enddate,tileH,tileV,collection,quiet=FALSE,wait=1,checkXML=FALSE)}
 
 \arguments{
 
@@ -32,7 +32,7 @@
     \code{Collection}. If many files have to be checked and downloaded
     it is simpler, safer and faster to use following parameters.}
 
-  \item{Product}{Character. (Ignored if \code{HdfName} is provided.) MODIS grid
+  \item{product}{Character. (Ignored if \code{HdfName} is provided.) MODIS grid
     product to be downloaded. For 'MODIS TERRA Vegetation Indices at 250
     m ground resolution' use: \code{MOD13Q1}. For vegetation indices
     from TERRA and AQUA use \code{MxD13Q1}. Combined Products "MCD" have
@@ -47,10 +47,13 @@
     of MODIS time series (format: "YYYY.MM.DD"). Can be a future date,
     for continuous update in a schedule job.}
 
-  \item{tileID}{Character (vector or list). (Ignored if \code{HdfName}
-  is provided.) Is the tile number. I.e.: \code{tileID = c("h19v05","h19v04")}. Refer to \url{http://modis-land.gsfc.nasa.gov/MODLAND_grid.htm} to find your area. Some more advanced methods will come soon.}
+  \item{tileH}{Character vector. (Ignored if \code{HdfName}
+  is provided.) Horizontal tile number(s) (between 1 and 35). I.e.: \code{tileH = 1:5}. Refer to \url{http://modis-land.gsfc.nasa.gov/MODLAND_grid.htm} to find your area. Some more advanced methods will come soon.}
 
-  \item{Collection}{Character or integer. (Ignored if \code{HdfName} is provided.) Refers to the MODIS Product Collection-version. Often '005', but see MODIS pages for more information.}
+  \item{tileV}{Character vector. (Ignored if \code{HdfName}
+  is provided.) Vertical tile number(s) (between 1 and 17). I.e.: \code{tileV = 9:17}. Refer to \url{http://modis-land.gsfc.nasa.gov/MODLAND_grid.htm} to find your area. Some more advanced methods will come soon.}
+
+  \item{collection}{Character or integer. (Ignored if \code{HdfName} is provided.) Refers to the MODIS Product Collection-version. Often '005', but see MODIS pages for more information.}
 
   \item{checkXML}{Logical. Default \code{FALSE}, MODIS-XML files are not downloaded
     with their MODIS-HDF file. If \code{TRUE} MODIS-HDF and
@@ -88,6 +91,6 @@
 # DO NOT RUN THE NEXT EXAMPLE (unless you need this data)!!!
 # Get all MODIS TERRA 13Q1 beginning from 01. January 2009 up to today.
 # If run in a scheduled batch job it will update the data until end of 2015.
-# getHDF(Product="MOD13Q1",startdate="2009.01.01",enddate="2015.12.31",tileID=c("h19v05","h19v04")) 
+# getHDF(product="MOD13Q1",startdate="2009.01.01",enddate="2015.12.31",tileH=19,tileV=4:5) 
 }
 

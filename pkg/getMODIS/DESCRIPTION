@@ -1,5 +1,5 @@
 Package: getMODIS
-Version: 0.1
+Version: 0.1-5
 Date: 2011-08-10
 Title: Creating or updating a local user-defined subsets of the global MODIS grid data online archive. Plus pre-processing functionalities for MODIS grid data.  
 Depends: RCurl

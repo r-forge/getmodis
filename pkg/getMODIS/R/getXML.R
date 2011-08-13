@@ -1,3 +1,7 @@
+# Author: Matteo Mattiuzzi, matteo.mattiuzzi@boku.ac.at
+# Date : July 2011
+# Version 0.2
+# Licence GPL v3
 
 getXML <- function(LocalArcPath="",HdfName="", wait=1){
 

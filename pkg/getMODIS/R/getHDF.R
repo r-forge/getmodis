@@ -1,11 +1,11 @@
-# Author: Matteo Mattiuzzi, matteo@mattiuzzi.com
+# Author: Matteo Mattiuzzi, matteo.mattiuzzi@boku.ac.at
 # Date : July 2011
 # Version 0.2
 # Licence GPL v3
 
 # TODO arcPath: 'simple' files are stored by Product, 'complex' files are stored in ftp-like structure
   
-getHDF <- function(LocalArcPath,HdfName,Product,startdate,enddate,tileID,Collection,quiet=FALSE,wait=1,checkXML=FALSE) {
+getHDF <- function(LocalArcPath,HdfName,product,startdate,enddate,tileH,tileV,collection,quiet=FALSE,wait=1,checkXML=FALSE) {
 
 if (missing(LocalArcPath)) {
 	if (.Platform$OS.type == "unix") {
@@ -68,17 +68,18 @@ cat("downloaded: ",HdfName[i],"\n")
 
 if (missing(startdate)) {stop("Please provide a 'startdate' (format: 'YYYY.MM.DD')")} 
 if (missing(enddate))   {stop("Please provide a 'endate' (format: 'YYYY.MM.DD')")} 
-if (missing(tileID))    {stop("Please provide the 'tileID(s)' ('hXXvXX')")} 
-if (missing(Product))   {stop("Please provide the MODIS-'Product'")}
-if (missing(Collection))   {stop("Please provide a Product-'Collection' (probably: '005')")} 
+if (missing(tileH))    {stop("Please provide 'tileH(s)' (1:35)")}
+if (missing(tileV))    {stop("Please provide 'tileH(s)' (1:17)")} 
+if (missing(product))   {stop("Please provide the MODIS-'product'")}
+if (missing(collection))   {stop("Please provide a product-'collection' (probably: '005')")} 
 
 
 # following variables will be activated when the packge is ready for that
 useExt        <- FALSE	## not implemented in the package version, needs LDOPE (if exist) use Extension file: "<Job>_1ULlat_2ULlon_3LRlat_4LRlon.txt"
 forceFtpCheck <-  TRUE # if FTP connection doesn't work FALSE will prozess files available in ARC! if TRUE without FTP there is no processing 
 
-# Check Platform and Product
-PF <- substr(Product,2,2)
+# Check Platform and product
+PF <- substr(product,2,2)
 
 if (PF %in% c("x","X")) { # oioioi
 		PF1  <- c("MOLT", "MOLA"); PF2  <- c("MOD", "MYD") 
@@ -89,14 +90,14 @@ if (PF %in% c("x","X")) { # oioioi
 	if (PF %in% c("o","O")) {
 		PF1  <- "MOLT"; PF2 <- "MOD"
 		} else {
-		stop("check 'Product', the Platform spezific part seams to be wrong. Not one of 'MOD','MYD','MXD'. ")
+		stop("check 'product', the Platform spezific part seams to be wrong. Not one of 'MOD','MYD','MXD'. ")
 		}
 	}
 } 
 
 
-# Check Product
-PD <- substr(Product,4,7)
+# Check product
+PD <- substr(product,4,7)
 
 if (!PD %in% c("13Q1", "09A1","09GA","09GQ", "09Q1")) { stop("at the moment supported only '13Q1', '09A1','09GA','09GQ', '09Q1', its easy to add other just tell me!")} 
 
@@ -107,7 +108,7 @@ end     <- as.Date(enddate,format="%Y.%m.%d")
 
 #### 
 # tileID
-tileID <- unlist(tileID)
+tileID <- getTILE(tileH=tileH,tileV=tileV)
 ntiles <- length(tileID)
 
 dirALL <- list()
