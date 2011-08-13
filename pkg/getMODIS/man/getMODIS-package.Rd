@@ -15,7 +15,7 @@ Installing additional software it is possible to further process downloaded data
 
 - LDOPE: format conversion, SDS-extraction, bit-extraction,... (\url{https://lpdaac.usgs.gov/lpdaac/tools/ldope_tools})
 
-Windows: not tested yet
+Windows: not tested yet.
 }
 
 \details{

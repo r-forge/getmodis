@@ -21,7 +21,8 @@ Some more advanced methods coming soon.
 
   \item{tileV}{Integer. Vertical tile number(s) (between 1 and 17). I.e.: \code{tileV = 9:12}.}
 
-  \item{extent}{XXX.XXX.}
+  \item{extent}{If List: \code{myExtent <- list(lat_min=mumeric,lat_max=mumeric,lon_max=mumeric,lon_min=mumeric)}
+  or \code{extent} from \code{package(raster)}.}
 }
 
 \value{Character. Tile id(s) formatted for MODIS names (I.e.: "h09v12") }
@@ -31,14 +32,18 @@ Some more advanced methods coming soon.
 }
 
 \seealso{
-  \code{\link[getMODIS]{getHDF}}
+  \code{\link{getHDF}} # add link to pkg raster
 }
 
 \examples{
+# with tileH and tileV
 # getTILE(tileH=19:22,tileV=5)
 
-# not implemented yet:
-# getTILE(extent=XXX)
+# with Extent (list)
+# Austria <- list(lat_min=46.12,lat_max=49.3,lon_max=17.47,lon_min=9.2)
+# getTILE(extent=Austria) # h18v04 and h19v04
 
+# with Extent (from package raster)
+# todo
 }
 
