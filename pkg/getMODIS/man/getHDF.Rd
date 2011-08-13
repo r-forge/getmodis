@@ -81,7 +81,7 @@
 }
 
 \seealso{
-  \code{\link[getMODIS]{getXML}}
+  \code{\link{getXML}}
 }
 
 \examples{

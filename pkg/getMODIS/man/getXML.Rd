@@ -52,7 +52,7 @@ getXML(LocalArcPath="",HdfName="", wait=1)
 }
 
 \seealso{
-  \code{\link[getMODIS]{getHDF}}
+  \code{\link{getHDF}}
 }
 
 \examples{
