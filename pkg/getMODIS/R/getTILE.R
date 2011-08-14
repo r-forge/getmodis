@@ -8,6 +8,7 @@ getTILE <- function(tileH,tileV,extent) {
 tiles <- list()
 
 if (!missing(extent) && class(extent) == "list"){
+
 data("tiletable") # this file solves the dependency from LDOPE (for this task!)
   # Austria <- list(lat_min=46.12,lat_max=49.3,lon_max=17.47,lon_min=9.2) # h18v04 and h19v04
 

@@ -141,8 +141,7 @@ for(z in 1:length(PF1)){ # Platforms MOD/MYD
 		doy  <- as.integer(format(as.Date(dates[[z]][i,1],format="%Y.%m.%d"), "%j"))
 		doy  <- sprintf("%03d",doy)
 		datu <- paste("A",year,doy,sep="")
-		mtr  <- matrix(1,ncol=ntiles,nrow=2) # for file situation flaging
-			if (checkXML!=TRUE) {mtr[2,] <- 0 } # if XML availability is not checked set to 0 row 2
+		mtr  <- rep(1,ncol=ntiles) # for file situation flaging
 
 # creates local directory (HDF file container)
 arcPath <- paste(LocalArcPath,PF2[z],PD,".",collection,"/",dates[[z]][i,1],"/",sep="")
@@ -157,55 +156,47 @@ dates[[z]][i,j+1] <- paste(PF2[z],PD[z],".",datu,".",tileID[j],".",collection,".
 		
 		if (length(HDF)>1) {
 			select <- list()
-			for (d in 1:length(HDF)){ # in very new files often there are more than 1 file/tile if so: 
-			select[[d]]<- strsplit(HDF[d],"\\.")[[1]][5] #"....YYYYDDDxxx.hdf" which.max gets the last processed!
+			for (d in 1:length(HDF)){ # in very new files there are more than 1 file/tile if so take the last 
+			select[[d]]<- strsplit(HDF[d],"\\.")[[1]][5]
 			}
 			HDF <- HDF[which.max(unlist(select))]		
 			}
 		dates[[z]][i,j+1] <- HDF
-
-	if(checkXML){ # if checkXML is TRUE && xml not local, it is downloaded here
-		xml <- getXML(HdfName = paste(arcPath,dates[[z]][i,j+1],sep=""))
-		mtr[2,j] <- xml # value returned from getXML is 0 (download.file() success) 
-		}
+		if(checkXML){getXML(HdfName = paste(arcPath,dates[[z]][i,j+1],sep=""))}
+		mtr[j] <- 0 # if available (abd in future checkXNL is a checksum, remove from todo
 	}
 } # pattern genereted for all files in dates[[z]][i,], if files where available the full name substitutes the patterns and if enabled checkXML, corresponding xml file are downloaded! 
 
-# if some files are missing, its necessary to go on ftp
+ # if one of the tiles is missing, its necessary to go on ftp
 if (sum(mtr)!=0) {
 	require(RCurl)
 	ftpfiles <- strsplit(getURL(paste(ftp, dates[[z]][i,1], "/", sep="")), if(.Platform$OS.type=="unix"){"\n"} else{"\r\n"})[[1]] # get HDF in dates[[z]][i,] 
 	if (ftpfiles[1] != "total 0") {ftpfiles <- unlist(lapply(strsplit(ftpfiles," "),function(x){x[length(x)]})) # found empty dir!
-		for(j in 1:ntiles){
-			if(sum(mtr[,j])!=0){
-				onFtp <- grep(ftpfiles,pattern=dates[[z]][i,j+1],value=T)
-				HDF   <- grep(onFtp,pattern=".hdf$",value=T)
-					if (length(HDF)>1) {
-						select <- list()
-						for (d in 1:length(HDF)){ # in very new files often there are more than 1 file/tile if so: 
-							select[[d]]<- strsplit(HDF[d],"\\.")[[1]][5] #"....YYYYDDDxxx.hdf" which.max gets the last processed! (I hope it is ok!)
-						}
-					HDF <- HDF[which.max(unlist(select))]		
-					}
-				dates[[z]][i,j+1] <- HDF
-			
-			if(mtr[1,j]==1 & length(HDF)==1){
-				hdf <- download.file(paste(ftp, dates[[z]][i,1], "/", HDF,sep=""), destfile=paste(arcPath, HDF, sep=""), mode='wb', method='wget', quiet=quiet, cacheOK=FALSE)
-				mtr[1,j] <- hdf
+	for(j in 1:ntiles){ # go thought tiles in date
+		if(mtr[j]!=0){ # if tile is missing get it
+		onFtp <- grep(ftpfiles,pattern=dates[[z]][i,j+1],value=T)
+		HDF   <- grep(onFtp,pattern=".hdf$",value=T)
+			if (length(HDF)>1) {
+			select <- list()
+			for (d in 1:length(HDF)){ # in very new situations there are more than 1 file/tile/date if so: 
+			select[[d]]<- strsplit(HDF[d],"\\.")[[1]][5] # get the last processed
+			}
+			HDF <- HDF[which.max(unlist(select))]		
+			}
+		dates[[z]][i,j+1] <- HDF
+		
+	hdf <- download.file(paste(ftp, dates[[z]][i,1], "/", HDF,sep=""), destfile=paste(arcPath, HDF, sep=""), mode='wb', method='wget', quiet=quiet, cacheOK=FALSE)
+	mtr[j] <- hdf
 
-        if (wait!=0){
-			      require(audio) # for wait() # is it good here?
-			      wait(as.numeric(wait)) # waiting seams to decrease the chanse of ftp collapse
-		      }
-			}
+        if (wait > 0){
+	require(audio) # for wait() # is it good here?
+	wait(as.numeric(wait)) # waiting seams to decrease the chanse of ftp collapse
+	}
 			
-			if(checkXML){xml <-  getXML(HdfName = paste(arcPath,dates[[z]][i,j+1],sep=""),wait=wait)
-				mtr[2,j] <- xml # value returned from getXML is 0 (download.file() success) 
-				} 		# if checkXML is TRUE && xml not local, it is downloaded
-	
-			}
+	if(checkXML){xml <-  getXML(HdfName = paste(arcPath,dates[[z]][i,j+1],sep=""),wait=wait)}
 		}
-	} else {dates[[z]][i,(j+1):ncol(dates[[z]])] <- "no files for that date on FTP"} # on ftp is possible to find empty folders!
+	}
+} else {dates[[z]][i,(j+1):ncol(dates[[z]])] <- "No files for that date on FTP"} # on ftp is possible to find empty folders!
 }
 dir.create(paste(LocalArcPath,"LOGS/",sep=""),showWarnings=FALSE)	
 write.csv(dates[[z]],file=paste(LocalArcPath,"LOGS/",PF2[z],PD,"_",collection,"_CECK.csv",sep=""))
