@@ -7,6 +7,8 @@
   
 getHDF <- function(LocalArcPath,HdfName,product,startdate,enddate,tileH,tileV,extent,collection,quiet=FALSE,wait=1,checkXML=FALSE) {
 
+if (wait > 0){require(audio)} # waiting seams to decrease the chance of ftp rejection!
+
 if (missing(LocalArcPath)) {
 	if (.Platform$OS.type == "unix") {
 		LocalArcPath <- "~/"
@@ -27,11 +29,12 @@ try(testDir <- list.dirs(LocalArcPath),silent=TRUE)
 # if filename is provided other args are ignored (filename is ok for not too many files (because of high ftp-request frequency)
 
 if (!missing(HdfName)){ 
+
 	HdfName <- unlist(HdfName)
 	for (i in seq(along=HdfName)){
 	
-	secName <- strsplit(HdfName[i],"\\.")[[1]] # decompose filename
-		
+	secName <- strsplit(HdfName[i],"\\.")[[1]]
+	
 		if (secName[length(secName)]!= "hdf"){stop(secName,"is not a good hdf HdfName")}
 					
 	PF <- substr(secName[1],1,3)
@@ -80,6 +83,7 @@ forceFtpCheck <-  TRUE # if FTP connection doesn't work FALSE will prozess files
 # Check Platform and product
 PF <- substr(product,2,2)
 
+#TODO if MCD, PF1 == "MOTA")
 if (PF %in% c("x","X")) { # oioioi
 		PF1  <- c("MOLT", "MOLA"); PF2  <- c("MOD", "MYD") 
 } else {
@@ -103,9 +107,11 @@ if (!PD %in% c("13Q1", "09A1","09GA","09GQ", "09Q1")) { stop("at the moment supp
 # collection
 collection <- sprintf("%03d",collection)
 
-#### convert dates # TODO error handling
-begin   <- as.Date(startdate,format="%Y.%m.%d") 
+#### convert dates 
+begin   <- as.Date(startdate,format="%Y.%m.%d")
+if (is.na(begin)) {stop("\n'startdate=",startdate,"' is eighter wrong format (not:'YYYY.MM.DD') or a invalid date")}
 end     <- as.Date(enddate,format="%Y.%m.%d") 
+if (is.na(end)) {stop("\n'enddate=",enddate,"' is eighter wrong format (not:'YYYY.MM.DD') or a invalid date")}
 ####
 
 #### 
@@ -125,6 +131,9 @@ for(z in 1:length(PF1)){ # Platforms MOD/MYD
 
 	require(RCurl) # the function doesn't start if it isn't able to check the ftpserver on entering... TODO force FTPcheck=FALSE
 	FtpDayDirs  <- strsplit(getURL(ftp), "\n")[[1]] # its important to minimise getURL() queries, every check = risk of FTP breack + much time!
+		if (wait > 0){wait(as.numeric(wait))}
+
+
 	FtpDayDirs  <- FtpDayDirs[substr(FtpDayDirs, 1, 1)=='d'] # removes not usable folders i.e the first: "total 34128"
 	dirALL[[z]] <- unlist(lapply(strsplit(FtpDayDirs, " "), function(x){x[length(x)]})) # dir name below ftp
 
@@ -147,7 +156,7 @@ for(z in 1:length(PF1)){ # Platforms MOD/MYD
 # creates local directory (HDF file container)
 arcPath <- paste(LocalArcPath,PF2[z],PD,".",collection,"/",dates[[z]][i,1],"/",sep="")
 dir.create(arcPath,showWarnings=FALSE,recursive=TRUE)
- 
+
 for(j in 1:ntiles){
 
 dates[[z]][i,j+1] <- paste(PF2[z],PD,".",datu,".",tileID[j],".",collection,".*.hdf$",sep="") # create pattern
@@ -172,10 +181,13 @@ dates[[z]][i,j+1] <- paste(PF2[z],PD,".",datu,".",tileID[j],".",collection,".*.h
 
 if (sum(mtr)!=0) { # if one or more of the tiles in date is missing, its necessary to go on ftp
 
-	ftpfiles <- strsplit(getURL(paste(ftp, dates[[z]][i,1], "/", sep="")), if(.Platform$OS.type=="unix"){"\n"} else{"\r\n"})[[1]] # get HDF in dates[[z]][i,] 
+	ftpfiles <- getURL(paste(ftp,dates[[z]][i,1],"/",sep=""))
+	ftpfiles <- strsplit(ftpfiles, if(.Platform$OS.type=="unix"){"\n"} else{"\r\n"})[[1]]
+		if (wait > 0){wait(as.numeric(wait))}
+
 	if (ftpfiles[1] != "total 0") {ftpfiles <- unlist(lapply(strsplit(ftpfiles," "),function(x){x[length(x)]})) # found empty dir!
 	
-		for(j in 1:ntiles){ # go thought tiles in date
+		for(j in 1:ntiles){
 		
 			if(mtr[j]==1){ # if tile is missing get it
 			onFtp <- grep(ftpfiles,pattern=dates[[z]][i,j+1],value=T)
@@ -189,16 +201,10 @@ if (sum(mtr)!=0) { # if one or more of the tiles in date is missing, its necessa
 				HDF <- HDF[which.max(unlist(select))]		
 				}
 
-	dates[[z]][i,j+1] <- HDF
-		
-	hdf <- download.file(paste(ftp, dates[[z]][i,1], "/", HDF,sep=""), destfile=paste(arcPath, HDF, sep=""), mode='wb', method='wget', quiet=quiet, cacheOK=FALSE)
-
-	mtr[j] <- hdf
-	
-	        		if (wait > 0){ # waiting seams to decrease the chance of ftp rejection!
-				require(audio)
-				wait(as.numeric(wait))
-				}			
+			dates[[z]][i,j+1] <- HDF
+			hdf <- download.file(paste(ftp, dates[[z]][i,1], "/", HDF,sep=""), destfile=paste(arcPath, HDF, sep=""), mode='wb', method='wget', quiet=quiet, cacheOK=FALSE)
+			mtr[j] <- hdf
+				if (wait > 0){wait(as.numeric(wait))}
 			}
 		}
 	} else {
