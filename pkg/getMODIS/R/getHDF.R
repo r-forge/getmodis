@@ -15,7 +15,7 @@ if (missing(LocalArcPath)) {
 		LocalArcPath <- path.expand(LocalArcPath)
 		LocalArcPath <- paste(LocalArcPath,"MODIS_ARC/",sep="")
 		dir.create(LocalArcPath,showWarnings=FALSE)
-		cat(paste("\n No arichive path set, using/creating standard archive in: ",LocalArcPath,"\n\n",sep=""))
+		cat(paste("\nNo arichive path set, using/creating standard archive in: ",LocalArcPath,"\n\n",sep=""))
 		flush.console()
 		} else {
 		stop("'LocalArcPath' not set properly")
@@ -67,7 +67,8 @@ if (!missing(HdfName)){
 	}
 cat("downloaded: ",HdfName[i],"\n")
 
-} else { # end by HdfName
+# if HdfName is'nt provided:
+} else {
 
 if (missing(startdate)) {stop("Please provide a 'startdate' (format: 'YYYY.MM.DD')")} 
 if (missing(enddate))   {stop("Please provide a 'endate' (format: 'YYYY.MM.DD')")} 
@@ -102,19 +103,32 @@ if (PF %in% c("x","X")) { # oioioi
 # Check product
 PD <- substr(product,4,7)
 
-if (!PD %in% c("13Q1", "09A1","09GA","09GQ", "09Q1")) { stop("at the moment supported only '13Q1', '09A1','09GA','09GQ', '09Q1', its easy to add other just tell me!")} 
+#if (!PD %in% c("13Q1", "09A1","09GA","09GQ", "09Q1")) { stop("at the moment supported only '13Q1', '09A1','09GA','09GQ', '09Q1', its easy to add other just tell me!")} 
 
+
+data("MODIS_Products")
+for (i in 1:length(PF2)){
+
+	if (paste(PF2[i],PD,sep="") %in% MODIS_Products[,1]) {
+	ind <- which(MODIS_Products[,1] == paste(PF2[i],PD,sep=""))
+
+		if(as.character(MODIS_Products[ind,4])!="Tile"){stop(paste("You are looking for ",as.character(MODIS_Products[ind,4]),", which is not supported yet!",sep=""))
+		} else { 
+		if(i > 1) {cat("and\n")}
+		cat(paste("You are looking for ", as.character(MODIS_Products[ind,1]),", the ",as.character(MODIS_Products[ind,6])," ",as.character(MODIS_Products[ind,3])," product from ",as.character(MODIS_Products[ind,2])," with a ground resolution of ",as.character(MODIS_Products[ind,5]),"\n",sep=""))
+		}
+	} else {
+	cat(paste("No product found with the name ",PF2[i],PD,sep=""))}
+}
+#####
 # collection
 collection <- sprintf("%03d",collection)
-
 #### convert dates 
 begin   <- as.Date(startdate,format="%Y.%m.%d")
 if (is.na(begin)) {stop("\n'startdate=",startdate,"' is eighter wrong format (not:'YYYY.MM.DD') or a invalid date")}
 end     <- as.Date(enddate,format="%Y.%m.%d") 
 if (is.na(end)) {stop("\n'enddate=",enddate,"' is eighter wrong format (not:'YYYY.MM.DD') or a invalid date")}
 ####
-
-#### 
 # tileID
 if(!missing(extent)) {
   tileID <- getTILE(extent=extent)
