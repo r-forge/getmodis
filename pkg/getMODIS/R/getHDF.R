@@ -13,7 +13,7 @@ if (missing(LocalArcPath)) {
 		LocalArcPath <- path.expand(LocalArcPath)
 		LocalArcPath <- paste(LocalArcPath,"MODIS_ARC/",sep="")
 		dir.create(LocalArcPath,showWarnings=FALSE)
-		cat(paste("\n No arichve path set, using/creating standard archive in: ",LocalArcPath,"\n\n",sep=""))
+		cat(paste("\n No arichive path set, using/creating standard archive in: ",LocalArcPath,"\n\n",sep=""))
 		flush.console()
 		} else {
 		stop("'LocalArcPath' not set properly")
@@ -125,7 +125,7 @@ for(z in 1:length(PF1)){ # Platforms MOD/MYD
 
 	require(RCurl) # the function doesn't start if it isn't able to check the ftpserver on entering... TODO force FTPcheck=FALSE
 	FtpDayDirs  <- strsplit(getURL(ftp), "\n")[[1]] # its important to minimise getURL() queries, every check = risk of FTP breack + much time!
-	FtpDayDirs <- FtpDayDirs[substr(FtpDayDirs, 1, 1)=='d'] # removes not usable folders i.e the first: "total 34128" 
+	FtpDayDirs  <- FtpDayDirs[substr(FtpDayDirs, 1, 1)=='d'] # removes not usable folders i.e the first: "total 34128"
 	dirALL[[z]] <- unlist(lapply(strsplit(FtpDayDirs, " "), function(x){x[length(x)]})) # dir name below ftp
 
 	sel <- as.Date(dirALL[[z]],format="%Y.%m.%d") # convert to date
@@ -137,6 +137,7 @@ for(z in 1:length(PF1)){ # Platforms MOD/MYD
 
 #### check archive... download
 	for (i in 1:nrow(dates[[z]])){
+
 		year <- format(as.Date(dates[[z]][i,1],format="%Y.%m.%d"), "%Y")
 		doy  <- as.integer(format(as.Date(dates[[z]][i,1],format="%Y.%m.%d"), "%j"))
 		doy  <- sprintf("%03d",doy)
@@ -147,16 +148,17 @@ for(z in 1:length(PF1)){ # Platforms MOD/MYD
 arcPath <- paste(LocalArcPath,PF2[z],PD,".",collection,"/",dates[[z]][i,1],"/",sep="")
 dir.create(arcPath,showWarnings=FALSE,recursive=TRUE)
  
-for(j in 1:ntiles){ # in one date get tiles in tileID
+for(j in 1:ntiles){
 
-dates[[z]][i,j+1] <- paste(PF2[z],PD[z],".",datu,".",tileID[j],".",collection,".*.hdf$",sep="") # create pattern
+dates[[z]][i,j+1] <- paste(PF2[z],PD,".",datu,".",tileID[j],".",collection,".*.hdf$",sep="") # create pattern
 	
-	if (length(dir(arcPath,pattern=dates[[z]][i,j+1]))>0){ # if file found locally
-		HDF <- dir(arcPath,pattern=dates[[z]][i,j+1])  # extract only the HDF file
+	if (length(dir(arcPath,pattern=dates[[z]][i,j+1]))>0){ # if available locally
 		
-		if (length(HDF)>1) {
+		HDF <- dir(arcPath,pattern=dates[[z]][i,j+1])  # extract HDF file
+		
+		if (length(HDF)>1) { # in very recent files sometimes there is more than 1 file/tile/date if so get the last
 			select <- list()
-			for (d in 1:length(HDF)){ # in very new files there are more than 1 file/tile if so take the last 
+			for (d in 1:length(HDF)){ 
 			select[[d]]<- strsplit(HDF[d],"\\.")[[1]][5]
 			}
 			HDF <- HDF[which.max(unlist(select))]		
@@ -167,45 +169,51 @@ dates[[z]][i,j+1] <- paste(PF2[z],PD[z],".",datu,".",tileID[j],".",collection,".
 	}
 }
 
- # if one of the tiles is missing, its necessary to go on ftp
-if (sum(mtr)!=0) {
-	require(RCurl)
+
+if (sum(mtr)!=0) { # if one or more of the tiles in date is missing, its necessary to go on ftp
+
 	ftpfiles <- strsplit(getURL(paste(ftp, dates[[z]][i,1], "/", sep="")), if(.Platform$OS.type=="unix"){"\n"} else{"\r\n"})[[1]] # get HDF in dates[[z]][i,] 
 	if (ftpfiles[1] != "total 0") {ftpfiles <- unlist(lapply(strsplit(ftpfiles," "),function(x){x[length(x)]})) # found empty dir!
-	for(j in 1:ntiles){ # go thought tiles in date
-		if(mtr[j]!=0){ # if tile is missing get it
-		onFtp <- grep(ftpfiles,pattern=dates[[z]][i,j+1],value=T)
-		HDF   <- grep(onFtp,pattern=".hdf$",value=T)
-			if (length(HDF)>1) {
-			select <- list()
-			for (d in 1:length(HDF)){ # in very new situations there are more than 1 file/tile/date if so: 
-			select[[d]]<- strsplit(HDF[d],"\\.")[[1]][5] # get the last processed
-			}
-			HDF <- HDF[which.max(unlist(select))]		
-			}
-		dates[[z]][i,j+1] <- HDF
+	
+		for(j in 1:ntiles){ # go thought tiles in date
+		
+			if(mtr[j]==1){ # if tile is missing get it
+			onFtp <- grep(ftpfiles,pattern=dates[[z]][i,j+1],value=T)
+			HDF   <- grep(onFtp,pattern=".hdf$",value=T)
+		
+				if (length(HDF)>1) { # in very recent files sometimes there is more than 1 file/tile/date if so get the last
+				select <- list()
+				for (d in 1:length(HDF)){
+				select[[d]]<- strsplit(HDF[d],"\\.")[[1]][5]
+				}
+				HDF <- HDF[which.max(unlist(select))]		
+				}
+
+	dates[[z]][i,j+1] <- HDF
 		
 	hdf <- download.file(paste(ftp, dates[[z]][i,1], "/", HDF,sep=""), destfile=paste(arcPath, HDF, sep=""), mode='wb', method='wget', quiet=quiet, cacheOK=FALSE)
+
 	mtr[j] <- hdf
-
-        		if (wait > 0){
-			require(audio) # for wait() # is it good here?
-			wait(as.numeric(wait)) # waiting seams to decrease the chanse of ftp collapse
-			}			
+	
+	        		if (wait > 0){ # waiting seams to decrease the chance of ftp rejection!
+				require(audio)
+				wait(as.numeric(wait))
+				}			
+			}
 		}
-	}
-} else {dates[[z]][i,(j+1):ncol(dates[[z]])] <- "No files for that date on FTP"} # on ftp is possible to find empty folders!
+	} else {
+	dates[[z]][i,(j+1):ncol(dates[[z]])] <- "No files for that date on FTP"} # on ftp is possible to find empty folders!
 }
-
-if(checkXML){xml <-  getXML(HdfName = list(paste(arcPath,dates[[z]][i,-1],sep="")),wait=wait)} # list() should not be needed
 
 dir.create(paste(LocalArcPath,"LOGS/",sep=""),showWarnings=FALSE)	
 write.csv(dates[[z]],file=paste(LocalArcPath,"LOGS/",PF2[z],PD,"_",collection,"_CECK.csv",sep=""))
 
+if(checkXML){xml <-  getXML(HdfName = list(paste(arcPath,dates[[z]][i,-1],sep="")),wait=wait)} # list() should not be needed
+
 } # end dates i 
-} # end Platform z
-} # end if not file 
+} # end platform z
+} # end if not HdfName 
 } ## END: FTP vs ARC check and download 
-# ... post processings, require MRT and maybe LDOPE 
+
 
 
