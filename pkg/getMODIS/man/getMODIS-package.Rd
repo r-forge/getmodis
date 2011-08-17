@@ -35,7 +35,9 @@ Maintainer: Matteo Mattiuzzi \email{matteo.mattiuzzi@boku.ac.at}
 }
 
 \references{
-  TODO, MODIS stuff
+MODIS data pool home page with list of data access possibilities: \url{https://lpdaac.usgs.gov/lpdaac/get_data/data_pool}\cr
+MODIS data pool server: \url{ftp://e4ftl01u.ecs.nasa.gov/}\cr
+MODIS home page: \url{http://modis.gsfc.nasa.gov/}\cr
 }
 
 \keyword{package}

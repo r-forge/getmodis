@@ -23,12 +23,7 @@
 
   \item{LocalArcPath}{Character. Local path to look for and to download MODIS files. If missing the default archive "~/MODIS_ARC/" (under LINUX) is used.}
 
-  \item{HdfName}{Character (vector or list). Full HDF file name(s) to download. If
-    just few single (AND known!) files should be downloaded use
-    \code{HdfName}. If \code{HdfName} is provided the other file-related
-    Parameters are ignored: \code{startdate, enddate, tileID} and
-    \code{Collection}. If many files have to be checked and downloaded
-    it is simpler, safer and faster to use following parameters.}
+  \item{HdfName}{Character (vector or list). Full HDF file name(s) to download. If just few single (AND known!) files should be downloaded use \code{HdfName}. If \code{HdfName} is provided the other file-related parameters are ignored: \code{startdate, enddate, collection, tileV,...}. If many files have to be checked and downloaded it is simpler, safer and faster to use following parameters.}
 
   \item{product}{Character. (Ignored if \code{HdfName} is provided.) MODIS grid product to be downloaded. For 'MODIS TERRA Vegetation Indices at 250 m ground resolution' use: \code{MOD13Q1}. For vegetation indices from TERRA and AQUA use \code{MxD13Q1}. Combined Products "MCD" have not been tested and are recognised as an error (for now). See \url{https://lpdaac.usgs.gov/lpdaac/products/modis_products_table} for more Products.}   
     
