@@ -76,9 +76,9 @@ data("tiletable")
 # get the results
 
 tileH <- as.vector(tileH)
-	if (tileH < 0 | tileH > 36) {stop("'tileH' number(s) must be between 0 and 35")}
+	if (tileH < 0 || tileH > 36) {stop("'tileH' number(s) must be between 0 and 35")}
 tileV <- as.vector(tileV)
-	if (tileV < 0 | tileV > 17) {stop("'tileV' number(s) must be between 0 and 17")}
+	if (tileV < 0 || tileV > 17) {stop("'tileV' number(s) must be between 0 and 17")}
 for (i in seq(along=tileH)){
 	tiles[[i]] <- paste("h",sprintf("%02d",tileH[i]),"v",sprintf("%02d",tileV),sep="")	
 }
