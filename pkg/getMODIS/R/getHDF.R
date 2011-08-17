@@ -120,6 +120,7 @@ for (i in 1:length(PF2)){
 	} else {
 	cat(paste("No product found with the name ",PF2[i],PD,sep=""))}
 }
+cat("\n")
 #####
 # collection
 collection <- sprintf("%03d",collection)
