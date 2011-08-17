@@ -205,8 +205,8 @@ if (sum(mtr)!=0) { # if one or more of the tiles in date is missing, its necessa
 		for(j in 1:ntiles){
 		
 			if(mtr[j]==1){ # if tile is missing get it
-			onFtp <- grep(ftpfiles,pattern=dates[[z]][i,j+1],value=T)
-			HDF   <- grep(onFtp,pattern=".hdf$",value=T)
+			onFtp <- grep(ftpfiles,pattern=dates[[z]][i,j+1],value=TRUE)
+			HDF   <- grep(onFtp,pattern=".hdf$",value=TRUE)
 		
 				if (length(HDF)>1) { # in very recent files sometimes there is more than 1 file/tile/date if so get the last
 				select <- list()

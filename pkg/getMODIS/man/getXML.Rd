@@ -3,7 +3,7 @@
 \docType{methods}
 
 \alias{getXML}
-\alias{getXML,LocalArcPath,HdfName,wait}
+\alias{getXML,LocalArcPath,HdfName,wait,quiet}
 
 \title{Mirroring corresponding xml-metadata-files for any MODIS-grid-hdf
   files in the query.}
@@ -18,7 +18,7 @@
 }
 
 \usage{
-getXML(LocalArcPath="",HdfName="", wait=1)
+getXML(LocalArcPath="",HdfName="", wait=1,quiet=FALSE)
 }
 
 \arguments{
@@ -39,6 +39,9 @@ getXML(LocalArcPath="",HdfName="", wait=1)
   requests. Requires the 'audio' package. Recommended values 1 to 3
   seconds, the more Files higer value. (Hopefully \code{wait} is a
   temporary solution!)}
+  
+\item{quiet}{Logical. Refers to all internal \code{download.file()} actions. Default \code{FALSE}}
+
 }
 
 \value{

@@ -3,7 +3,7 @@
 # Version 0.2
 # Licence GPL v3
 
-getXML <- function(LocalArcPath="",HdfName="", wait=1){
+getXML <- function(LocalArcPath="",HdfName="", wait=1,quiet=FALSE){
 
 ###################
 if (LocalArcPath!=""){
@@ -50,7 +50,7 @@ doit <- sapply(avFiles,function(x) {
 	)
 		
 avFiles <- avFiles[doit] 
-names(doit==1)
+
 
 # out from here only valid MODIS.GRID.HDFs should come
 
@@ -60,11 +60,6 @@ if(length(avFiles)==0) {return(cat("No MODIS-XML files to download.\n"))} else {
 success <- rep(NA,length(avFiles))
     for (u in seq(along=avFiles)){
 
-	name <- strsplit(avFiles[u],"/")[[1]] # separate name from path
-	name <- name[length(name)] # select filename
-	secName  <- strsplit(name,"\\.")[[1]] # decompose filename
-	PF <- substr(secName[1],1,3)
-
 	if ( !file.exists(paste(avFiles[u],".xml",sep="")) || # if xml-file doesn't exists 
 
 	 	if ( .Platform$OS.type == "unix") {as.numeric(system(paste("stat -c %s ",avFiles[u],".xml",sep=""), intern=TRUE)) < 2000}else{FALSE} # tested on Ubuntu 11.04
@@ -72,6 +67,11 @@ success <- rep(NA,length(avFiles))
 # 		if (!.Platform$OS.type %in% c("unix","windows")) {FALSE} # if not unix or windows, skip this test...(for now)
 	# if file exists but smaller than 2000 B...  so probably brocken download
 	){
+
+	name <- strsplit(avFiles[u],"/")[[1]] # separate filename from path
+	name <- name[length(name)]
+	secName  <- strsplit(name,"\\.")[[1]] # decompose filename
+	PF <- substr(secName[1],1,3)
 
 	if(PF=="MOD"){PF <- "MOLT"} else {PF <- "MOLA"}
 
@@ -85,16 +85,16 @@ success <- rep(NA,length(avFiles))
 	success[u] <- download.file(
 			paste("ftp://e4ftl01u.ecs.nasa.gov/", PF,"/",secName[1],".",version,"/",date,"/",name,".xml",sep=""),
 			destfile=paste(avFiles[u],".xml",sep=""),
-			mode='wb', method='wget', quiet=F, cacheOK=FALSE)
+			mode='wb', method='wget', quiet=quiet, cacheOK=FALSE)
 
 		if (wait!=0){
-			require(audio) # for wait() # is it good here?
-			wait(as.numeric(wait)) # waiting seams to decrease the chanse of ftp collapse
+		require(audio)
+		wait(as.numeric(wait))
 		}
 	} else {
 	success[u] <- 0}
 	} # avFiles[u] 
-return(success)
+invisible(success)
 } # if avFiles > 0
 } # end getMODIS::.getXML
 
