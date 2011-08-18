@@ -78,33 +78,26 @@ if (missing(collection)){stop("Please provide a product-'collection' (probably: 
 
 
 # following variables will be activated when the packge is ready for that
-useExt        <- FALSE	## not implemented in the package version, needs LDOPE (if exist) use Extension file: "<Job>_1ULlat_2ULlon_3LRlat_4LRlon.txt"
-forceFtpCheck <-  TRUE # if FTP connection doesn't work FALSE will prozess files available in ARC! if TRUE without FTP there is no processing 
+useExt        <- FALSE # TODO
+forceFtpCheck <-  TRUE # TODO
 
 # Check Platform and product
 PF <- substr(product,2,2)
 
 #TODO if MCD, PF1 == "MOTA")
-if (PF %in% c("x","X")) { # oioioi
-		PF1  <- c("MOLT", "MOLA"); PF2  <- c("MOD", "MYD") 
-} else {
-	if (PF %in% c("y","Y")) {
-		PF1  <- "MOLA"; PF2 <- "MYD"
-	} else {
-	if (PF %in% c("o","O")) {
-		PF1  <- "MOLT"; PF2 <- "MOD"
-		} else {
-		stop("check 'product', the Platform spezific part seams to be wrong. Not one of 'MOD','MYD','MXD'. ")
-		}
-	}
-} 
+if 	  (PF %in% c("x","X")) { PF1  <- c("MOLT", "MOLA"); PF2  <- c("MOD", "MYD") 
+} else if (PF %in% c("y","Y")) { PF1  <- "MOLA"; PF2 <- "MYD"
+} else if (PF %in% c("o","O")) { PF1  <- "MOLT"; PF2 <- "MOD"
+} else if (PF %in% c("c","C")) { PF1  <- "MOTA"; PF2 <- "MCD"
+} else {stop("Check 'product', the Platform specific part seams wrong. Not one of 'MOD','MYD','MXD','MCD'.")
+}
 
 
 # Check product
-PD <- substr(product,4,7)
-
-#if (!PD %in% c("13Q1", "09A1","09GA","09GQ", "09Q1")) { stop("at the moment supported only '13Q1', '09A1','09GA','09GQ', '09Q1', its easy to add other just tell me!")} 
-
+PD <- substr(product,4,7) #'09Q1',...
+#####
+# collection
+collection <- sprintf("%03d",collection)
 
 data("MODIS_Products")
 for (i in 1:length(PF2)){
@@ -112,18 +105,17 @@ for (i in 1:length(PF2)){
 	if (paste(PF2[i],PD,sep="") %in% MODIS_Products[,1]) {
 	ind <- which(MODIS_Products[,1] == paste(PF2[i],PD,sep=""))
 
-		if(as.character(MODIS_Products[ind,4])!="Tile"){stop(paste("You are looking for ",as.character(MODIS_Products[ind,4]),", which is not supported yet!",sep=""))
+		if(as.character(MODIS_Products[ind,4])!="Tile"){stop(paste("You are looking for a",as.character(MODIS_Products[ind,4])," product, only 'tile' data is supported yet!",sep=""))
 		} else { 
-		if(i > 1) {cat("and\n")}
-		cat(paste("You are looking for ", as.character(MODIS_Products[ind,1]),", the ",as.character(MODIS_Products[ind,6])," ",as.character(MODIS_Products[ind,3])," product from ",as.character(MODIS_Products[ind,2])," with a ground resolution of ",as.character(MODIS_Products[ind,5]),"\n",sep=""))
+		if(i == 1){cat("\n")} else {cat("and\n")}
+		cat(paste("You are looking for ", as.character(MODIS_Products[ind,1])," collection ",collection,", the ",as.character(MODIS_Products[ind,6])," ",as.character(MODIS_Products[ind,3])," product from ",as.character(MODIS_Products[ind,2])," with a ground resolution of ",as.character(MODIS_Products[ind,5]),"\n",sep=""))
 		}
 	} else {
 	cat(paste("No product found with the name ",PF2[i],PD,sep=""))}
 }
 cat("\n")
-#####
-# collection
-collection <- sprintf("%03d",collection)
+
+
 #### convert dates 
 begin   <- as.Date(startdate,format="%Y.%m.%d")
 if (is.na(begin)) {stop("\n'startdate=",startdate,"' is eighter wrong format (not:'YYYY.MM.DD') or a invalid date")}
@@ -132,9 +124,10 @@ if (is.na(end)) {stop("\n'enddate=",enddate,"' is eighter wrong format (not:'YYY
 ####
 # tileID
 if(!missing(extent)) {
-  tileID <- getTILE(extent=extent)
+  tileID <- getTILE(extent=extent)$tile
   } else {
-  tileID <- getTILE(tileH=tileH,tileV=tileV)}
+  tileID <- getTILE(tileH=tileH,tileV=tileV)$tile
+  }
 ntiles <- length(tileID)
 
 dirALL <- list()
@@ -147,7 +140,6 @@ for(z in 1:length(PF1)){ # Platforms MOD/MYD
 	require(RCurl) # the function doesn't start if it isn't able to check the ftpserver on entering... TODO force FTPcheck=FALSE
 	FtpDayDirs  <- strsplit(getURL(ftp), "\n")[[1]] # its important to minimise getURL() queries, every check = risk of FTP breack + much time!
 		if (wait > 0){wait(as.numeric(wait))}
-
 
 	FtpDayDirs  <- FtpDayDirs[substr(FtpDayDirs, 1, 1)=='d'] # removes not usable folders i.e the first: "total 34128"
 	dirALL[[z]] <- unlist(lapply(strsplit(FtpDayDirs, " "), function(x){x[length(x)]})) # dir name below ftp
@@ -187,7 +179,6 @@ dates[[z]][i,j+1] <- paste(PF2[z],PD,".",datu,".",tileID[j],".",collection,".*.h
 			}
 			HDF <- HDF[which.max(unlist(select))]		
 			}
-	
 	dates[[z]][i,j+1] <- HDF
 	mtr[j] <- 0
 	}
@@ -215,7 +206,6 @@ if (sum(mtr)!=0) { # if one or more of the tiles in date is missing, its necessa
 				}
 				HDF <- HDF[which.max(unlist(select))]		
 				}
-
 			dates[[z]][i,j+1] <- HDF
 			hdf <- download.file(paste(ftp, dates[[z]][i,1], "/", HDF,sep=""), destfile=paste(arcPath, HDF, sep=""), mode='wb', method='wget', quiet=quiet, cacheOK=FALSE)
 			mtr[j] <- hdf
