@@ -57,18 +57,15 @@ if (!missing(HdfName)){
 				destfile=paste(LocalArcPath, arcPath,HdfName[i],sep=""),
 				mode='wb', method='wget', quiet=quiet, cacheOK=FALSE)
 			
-			if (wait!=0) {
-				require(audio)
-				wait(wait)				
-			}
+			if (wait!=0) {wait(wait)}
 
 		}
 		if(checkXML){getXML(HdfName = HdfName[i])}
 	}
 cat("downloaded: ",HdfName[i],"\n")
 
-# if HdfName is'nt provided:
-} else {
+
+} else { # if HdfName is'nt provided:
 
 if (missing(startdate)) {stop("Please provide a 'startdate' (format: 'YYYY.MM.DD')")} 
 if (missing(enddate))   {stop("Please provide a 'endate' (format: 'YYYY.MM.DD')")} 
@@ -94,7 +91,7 @@ if 	  (PF %in% c("x","X")) { PF1  <- c("MOLT", "MOLA"); PF2  <- c("MOD", "MYD")
 
 
 # Check product
-PD <- substr(product,4,7) #'09Q1',...
+PD <- substr(product,4,nchar(product)) #'09Q1',...
 #####
 # collection
 collection <- sprintf("%03d",collection)
@@ -105,7 +102,7 @@ for (i in 1:length(PF2)){
 	if (paste(PF2[i],PD,sep="") %in% MODIS_Products[,1]) {
 	ind <- which(MODIS_Products[,1] == paste(PF2[i],PD,sep=""))
 
-		if(as.character(MODIS_Products[ind,4])!="Tile"){stop(paste("You are looking for a",as.character(MODIS_Products[ind,4])," product, only 'tile' data is supported yet!",sep=""))
+if(as.character(MODIS_Products[ind,4])!="Tile"){stop(paste("You are looking for a '",as.character(MODIS_Products[ind,4]),"' product, only 'tile' data is supported yet!",sep=""))
 		} else { 
 		if(i == 1){cat("\n")} else {cat("and\n")}
 		cat(paste("You are looking for ", as.character(MODIS_Products[ind,1])," collection ",collection,", the ",as.character(MODIS_Products[ind,6])," ",as.character(MODIS_Products[ind,3])," product from ",as.character(MODIS_Products[ind,2])," with a ground resolution of ",as.character(MODIS_Products[ind,5]),"\n",sep=""))
@@ -129,6 +126,8 @@ if(!missing(extent)) {
   tileID <- getTILE(tileH=tileH,tileV=tileV)$tile
   }
 ntiles <- length(tileID)
+
+# if (substr(PD,3,nchar(PD))=="CMG") {tileID="";ntiles=1} # TODO if 'CMG' 
 
 dirALL <- list()
 dates  <- list()
