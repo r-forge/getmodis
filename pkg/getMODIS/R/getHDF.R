@@ -97,12 +97,14 @@ PD <- substr(product,4,nchar(product)) #'09Q1',...
 collection <- sprintf("%03d",collection)
 
 data("MODIS_Products")
+
+# validy check and information
 for (i in 1:length(PF2)){
 
 	if (paste(PF2[i],PD,sep="") %in% MODIS_Products[,1]) {
 	ind <- which(MODIS_Products[,1] == paste(PF2[i],PD,sep=""))
 
-if(as.character(MODIS_Products[ind,4])!="Tile"){stop(paste("You are looking for a '",as.character(MODIS_Products[ind,4]),"' product, only 'tile' data is supported yet!",sep=""))
+if(as.character(MODIS_Products[ind,4])=="Swath"){stop(paste("You are looking for a '",as.character(MODIS_Products[ind,4]),"' product, only 'tile' data is supported yet!",sep=""))
 		} else { 
 		if(i == 1){cat("\n")} else {cat("and\n")}
 		cat(paste("You are looking for ", as.character(MODIS_Products[ind,1])," collection ",collection,", the ",as.character(MODIS_Products[ind,6])," ",as.character(MODIS_Products[ind,3])," product from ",as.character(MODIS_Products[ind,2])," with a ground resolution of ",as.character(MODIS_Products[ind,5]),"\n",sep=""))
@@ -120,14 +122,17 @@ end     <- as.Date(enddate,format="%Y.%m.%d")
 if (is.na(end)) {stop("\n'enddate=",enddate,"' is eighter wrong format (not:'YYYY.MM.DD') or a invalid date")}
 ####
 # tileID
-if(!missing(extent)) {
-  tileID <- getTILE(extent=extent)$tile
-  } else {
-  tileID <- getTILE(tileH=tileH,tileV=tileV)$tile
-  }
-ntiles <- length(tileID)
-
-# if (substr(PD,3,nchar(PD))=="CMG") {tileID="";ntiles=1} # TODO if 'CMG' 
+if (substr(PD,3,nchar(PD))=="CMG") {
+	tileID="GLOBAL"
+	ntiles=1 
+	} else {
+	if(!missing(extent)) {
+  	tileID <- getTILE(extent=extent)$tile
+ 	 } else {
+ 	 tileID <- getTILE(tileH=tileH,tileV=tileV)$tile
+ 	 }
+	ntiles <- length(tileID)
+}
 
 dirALL <- list()
 dates  <- list()
@@ -165,7 +170,7 @@ dir.create(arcPath,showWarnings=FALSE,recursive=TRUE)
 
 for(j in 1:ntiles){
 
-dates[[z]][i,j+1] <- paste(PF2[z],PD,".",datu,".",tileID[j],".",collection,".*.hdf$",sep="") # create pattern
+dates[[z]][i,j+1] <- paste(PF2[z],PD,".",datu,".",if (tileID!="GLOBAL") {paste(tileID[j],".",sep="")},collection,".*.hdf$",sep="") # create pattern
 	
 	if (length(dir(arcPath,pattern=dates[[z]][i,j+1]))>0){ # if available locally
 		
