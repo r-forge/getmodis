@@ -228,7 +228,7 @@ write.csv(dates[[z]],file=paste(LocalArcPath,"LOGS/",PF2[z],PD,"_",collection,"_
 if(checkXML){xml <-  getXML(HdfName = list(paste(arcPath,dates[[z]][i,-1],sep="")),wait=wait)} # list() should not be needed
 
 } # end dates i 
-}else{ cat(paste("No files on ftp in date range for: ",PF2[z],PD,".",collection,"\n",sep=""))  }
+}else{ cat(paste("No files on ftp in date range for: ",PF2[z],PD,".",collection,"\n\n",sep=""))  }
 } # if no files are avalable for product in date AND end platform z
 } # end if not HdfName 
 } ## END: FTP vs ARC check and download 
