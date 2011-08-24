@@ -6,19 +6,13 @@
 organiseStructure <- function(LocalArcPath,HdfName,to,remove=TRUE) {
 
 
-if (missing(to)| (!to %in% c(1:3))) stop("Provide a valid 'to' argument!")
-if (missing(LocalArcPath)) {LocalArcPath <- "./MODIS_ARC"; cat("No 'LocalArcPath' set, looking in '", LocalArcPath,"'.\n")}
-if (missing(HdfName)) {cat("No 'HdfName' pattern set, moving all MODIS grid data under '", LocalArcPath,"'.\n")} 
-#######################
-
+if (missing(to)|(!to %in% 1:3)) stop("Provide a valid 'to' argument!")
 
 if (missing(LocalArcPath)) {
 	if (.Platform$OS.type == "unix") {
-		LocalArcPath <- "~/"
-		LocalArcPath <- path.expand(LocalArcPath)
-		LocalArcPath <- paste(LocalArcPath,"MODIS_ARC",sep="")
-		dir.create(LocalArcPath,showWarnings=FALSE)
-		cat(paste("\nNo arichive path set, using/creating standard archive in: ",LocalArcPath,"\n\n",sep=""))
+		LocalArcPath <- path.expand("~/MODIS_ARC")
+		dir.create(LocalArcPath,showWarnings = FALSE)
+		cat(paste("\nNo arichive path set, looking in: ",LocalArcPath,"\n\n",sep=""))
 		flush.console()
 		} else {
 		stop("'LocalArcPath' not set properly")
@@ -29,6 +23,9 @@ LocalArcPath <- paste(strsplit(LocalArcPath,"/")[[1]],collapse="/")# removes "/"
 # test local LocalArcPath
 try(testDir <- list.dirs(LocalArcPath),silent=TRUE)
 	if(!exists("testDir")) {stop("'LocalArcPath' not set properly")} 
+
+if (missing(HdfName)) {cat(paste("No 'HdfName' pattern set, moving/coping all MODIS grid data found in '", LocalArcPath,"'.\n",sep=""))} 
+
 #################
 
 if(!missing(HdfName)) {

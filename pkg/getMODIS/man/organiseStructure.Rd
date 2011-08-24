@@ -45,7 +45,7 @@
 # organiseStructure(to=3,remove=TRUE)
 
 # COPY all MOD13Q1 to folder "/LocalArcPath/MOD13Q1.collection/"
-# organiseStructure(HdfName=MOD13Q1",to=1,remove=FALSE)
+# organiseStructure(HdfName="MOD13Q1",to=1,remove=FALSE)
 }
 
 
