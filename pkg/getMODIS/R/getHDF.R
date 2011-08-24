@@ -170,7 +170,7 @@ dir.create(arcPath,showWarnings=FALSE,recursive=TRUE)
 
 for(j in 1:ntiles){
 
-dates[[z]][i,j+1] <- paste(PF2[z],PD,".",datu,".",if (tileID!="GLOBAL") {paste(tileID[j],".",sep="")},collection,".*.hdf$",sep="") # create pattern
+dates[[z]][i,j+1] <- paste(PF2[z],PD,".",datu,".",if (tileID[j]!="GLOBAL") {paste(tileID[j],".",sep="")},collection,".*.hdf$",sep="") # create pattern
 	
 	if (length(dir(arcPath,pattern=dates[[z]][i,j+1]))>0){ # if available locally
 		
