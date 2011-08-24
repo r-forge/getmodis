@@ -2,7 +2,7 @@ Package: getMODIS
 Version: 0.1-12
 Date: 2011-08-10
 Title: Utility package for creating or updating a local user-defined subsets of the global MODIS grid data online archive. (Coming soon: Pre-processing functionalities for MODIS grid data.  
-Depends: RCurl
+Depends: R (>= 2.10), RCurl
 Suggests: raster, audio
 Author: Matteo Mattiuzzi; Institute of Surveying, Remote Sensing and Land Information (IVFL), BOKU Vienna
 Maintainer: Matteo Mattiuzzi <matteo.mattiuzzi@boku.ac.at>
