@@ -13,14 +13,15 @@ if (missing(LocalArcPath)) {
 	if (.Platform$OS.type == "unix") {
 		LocalArcPath <- "~/"
 		LocalArcPath <- path.expand(LocalArcPath)
-		LocalArcPath <- paste(LocalArcPath,"MODIS_ARC/",sep="")
+		LocalArcPath <- paste(LocalArcPath,"MODIS_ARC",sep="")
 		dir.create(LocalArcPath,showWarnings=FALSE)
-		cat(paste("\nNo arichive path set, using/creating standard archive in: ",LocalArcPath,"\n\n",sep=""))
+		cat(paste("No arichive path set, using/creating standard archive in: ",LocalArcPath,"\n",sep=""))
 		flush.console()
 		} else {
 		stop("'LocalArcPath' not set properly")
 	}
 }
+LocalArcPath <- paste(strsplit(LocalArcPath,"/")[[1]],collapse="/")# removes "/" on last position (if present)
 # test local LocalArcPath
 try(testDir <- list.dirs(LocalArcPath),silent=TRUE)
 	if(!exists("testDir")) {stop("'LocalArcPath' not set properly")} 
@@ -48,9 +49,9 @@ if (!missing(HdfName)){
 	collection <- secName[4]
 
 	arcPath <- paste(secName[1],".",collection,"/",date,"/",sep="")
-	dir.create(paste(LocalArcPath,arcPath,sep=""),recursive=TRUE,showWarnings=FALSE) # this always generates the same structure as the original ftp (this makes sense if the local LocalArcPath becomes big!)
+	dir.create(paste(LocalArcPath,"/",arcPath,sep=""),recursive=TRUE,showWarnings=FALSE) # this always generates the same structure as the original ftp (this makes sense if the local LocalArcPath becomes big!)
 	
-		if (!file.exists(paste(LocalArcPath,arcPath,HdfName[i],sep=""))) {
+		if (!file.exists(paste(LocalArcPath,"/",arcPath,HdfName[i],sep=""))) {
 		    require(RCurl)
 			download.file(
 				paste("ftp://e4ftl01u.ecs.nasa.gov/",PF1,"/", arcPath,HdfName[i],sep=""),
@@ -75,7 +76,7 @@ if (missing(collection)){stop("Please provide a product-'collection' (probably: 
 
 
 # following variables will be activated when the packge is ready for that
-useExt        <- FALSE # TODO
+# interactiveExtent        <- FALSE # TODO
 forceFtpCheck <-  TRUE # TODO
 
 # Check Platform and product
@@ -150,6 +151,7 @@ for(z in 1:length(PF1)){ # Platforms MOD/MYD
 
 	sel <- as.Date(dirALL[[z]],format="%Y.%m.%d") # convert to date
 	us  <- sel >= begin & sel <= end
+	if (sum(us)>0){ 
 	dates[[z]] <- dirALL[[z]][us]
 
 	dates[[z]] <- cbind(dates[[z]],matrix(rep(NA, length(dates[[z]])*ntiles),ncol=ntiles,nrow=length(dates[[z]])))
@@ -165,7 +167,7 @@ for(z in 1:length(PF1)){ # Platforms MOD/MYD
 		mtr  <- rep(1,ntiles) # for file situation flaging
 
 # creates local directory (HDF file container)
-arcPath <- paste(LocalArcPath,PF2[z],PD,".",collection,"/",dates[[z]][i,1],"/",sep="")
+arcPath <- paste(LocalArcPath,"/",PF2[z],PD,".",collection,"/",dates[[z]][i,1],"/",sep="")
 dir.create(arcPath,showWarnings=FALSE,recursive=TRUE)
 
 for(j in 1:ntiles){
@@ -226,7 +228,8 @@ write.csv(dates[[z]],file=paste(LocalArcPath,"LOGS/",PF2[z],PD,"_",collection,"_
 if(checkXML){xml <-  getXML(HdfName = list(paste(arcPath,dates[[z]][i,-1],sep="")),wait=wait)} # list() should not be needed
 
 } # end dates i 
-} # end platform z
+}else{ cat(paste("No files on ftp in date range for: ",PF2[z],PD,".",collection,"\n",sep=""))  }
+} # if no files are avalable for product in date AND end platform z
 } # end if not HdfName 
 } ## END: FTP vs ARC check and download 
 
