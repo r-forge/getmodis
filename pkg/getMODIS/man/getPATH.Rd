@@ -7,13 +7,14 @@
 \title{get path to MRT}
 
 \description{
-  If PATH variable to MRT is not set, this function tries }
+  If PATH variable to MRT is not set, this function search for it.}
 
-\usage{getPATH(quiet=FALSE)}
+\usage{getPATH(deep=FALSE,quiet=FALSE)}
 
 \arguments{
-  \item{quiet}{Logical. if run inside an other function use \code{quiet=TRUE}. Probably this function will become internal...}
-}
+  \item{deep}{Logical. Default \code{FALSE}, search path ".". If \code{TRUE} search path "/"}
+  \item{quiet}{Logical. if run inside an other function use \code{quiet=TRUE}. Probably this function will become internal...} 
+} 
 
 \value{
   Absolute path to MRT
