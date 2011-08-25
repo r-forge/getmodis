@@ -1,0 +1,18 @@
+Job         <- "Marchfeld_testJob"
+outDir      <- "./MRTresults" # will become: "./MRTresults/Job"  
+product     <- "MxD13Q1"  ## For available products see: ftp://e4ftl01u.ecs.nasa.gov/ and browse or on https://lpdaac.usgs.gov/lpdaac/products/modis_products_table !!!
+collection  <- "005"	## Modis Processing version number probable you are happy with "005"
+startdate   <- "2003.05.01"  ## start-date YYYY.MM.DD, limit periode to be downloaded/processed
+enddate     <- "2003.05.31"  ## end-date YYYY.MM.DD,limit periode to be downloaded/processed
+extent      <-  list(lat_min=46.12,lat_max=49.3,lon_min=9.2,lon_max=17.47) # see: ?getTILE for possobilities
+
+############ cunsult MRT manual for details
+pixelsize <- "" # leave empty or remove if pixelsize input == output
+resample  <- "NN" # "NN", "CC" or "BI"
+outProj   <- "WGS84" # See: MRT doc for available 
+
+# extract SDS TODO
+
+# encode bits TODO
+
+
