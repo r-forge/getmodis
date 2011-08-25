@@ -11,20 +11,19 @@ if (wait > 0){require(audio)} # waiting seams to decrease the chance of ftp reje
 
 if (missing(LocalArcPath)) {
 	if (.Platform$OS.type == "unix") {
-		LocalArcPath <- "~/"
-		LocalArcPath <- path.expand(LocalArcPath)
-		LocalArcPath <- paste(LocalArcPath,"MODIS_ARC",sep="")
-		dir.create(LocalArcPath,showWarnings=FALSE)
+		LocalArcPath <- path.expand("~/MODIS_ARC")
 		cat(paste("No arichive path set, using/creating standard archive in: ",LocalArcPath,"\n",sep=""))
 		flush.console()
 		} else {
-		stop("'LocalArcPath' not set properly")
+		stop("Set aprorpiate 'LocalArcPath'")
 	}
 }
 LocalArcPath <- paste(strsplit(LocalArcPath,"/")[[1]],collapse="/")# removes "/" on last position (if present)
+
+dir.create(LocalArcPath,showWarnings=FALSE)
 # test local LocalArcPath
 try(testDir <- list.dirs(LocalArcPath),silent=TRUE)
-	if(!exists("testDir")) {stop("'LocalArcPath' not set properly")} 
+	if(!exists("testDir")) {stop("'LocalArcPath' not set properly!")} 
 #################
 
 # if filename is provided other args are ignored (filename is ok for not too many files (because of high ftp-request frequency)

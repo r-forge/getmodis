@@ -2,7 +2,6 @@
 # Date: August 2011
 # Licence GPL v3
 
-
 organiseStructure <- function(LocalArcPath,HdfName,to,remove=TRUE) {
 
 

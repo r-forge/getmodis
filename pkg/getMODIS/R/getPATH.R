@@ -4,15 +4,23 @@
 # Licence GPL v3
 
 
-getPATH <- function(){
+getPATH <- function(deep=FALSE,quiet=FALSE){
 if (Sys.getenv("MRT_HOME")!=""){
 	MRTpath <- Sys.getenv("MRT_HOME")
 	MRTpath <- paste(MRTpath,"/bin/",sep="")
-	cat("If this path doesn't work check you path for 'MRT_HOME'\n")
+	if (!quiet) cat("If this path doesn't work check you path for 'MRT_HOME'\n")
 }else { 
-	cat("No path variable found for MRT, trying to look for MRT /bin (this can take a while)\n")
-	MRTpath <- list.files(path = ".", pattern = "mrtmosaic",full.names = TRUE, recursive = TRUE,ignore.case = FALSE) # looks recursive in local dir!
-	isit <- strsplit(MRTpath,"/")
+ 
+  if (!quiet) {
+      if (deep) {
+          cat("No path variable found for MRT, trying to look for MRT/bin in deep modus (this can take a while, may consider aborting it!)\n")
+          }else{
+          cat("No path variable found for MRT, trying to look for MRT/bin (this can take a while)\n")
+          }   
+      
+  MRTpath <- list.files(path = if(deep){"/"}else{"."}, pattern = "mrtmosaic",full.names = TRUE, recursive = TRUE,ignore.case = FALSE) # looks recursive in local dir!
+  if (length(MRTpath>0){
+  isit <- strsplit(MRTpath,"/")
 	getBIN  <- sapply(isit,function(x){x[(length(x)-1)]=="bin"})
 
 	if(sum(as.numeric(getBIN))==1){
@@ -21,9 +29,15 @@ if (Sys.getenv("MRT_HOME")!=""){
 		MRTpath <- paste(isit[-length(isit)],collapse="/")
 		MRTpath <-paste(MRTpath,"/",sep="")
 	} else {
-	cat("I'm not sure, is it one of those?\n")
+	if (!quiet) cat("I'm not sure, is it one of those?\n")
 	}
-}
+}   
 MRTpath
+} else {
+    if (!quiet){
+      cat("MRT not found, sorry but you have to solve this problem first\n")
+      }
+MRTpath <- 0
+    }
 }
 
