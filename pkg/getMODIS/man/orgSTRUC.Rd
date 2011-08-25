@@ -1,14 +1,14 @@
-\name{organiseStructure}
+\name{orgSTRUC}
 
 \docType{methods}
 
-\alias{organiseStructure}
+\alias{orgSTRUC}
 
 \title{Change structure of local Archive}
 
 \description{This function changes the storage structure (see details). Depending on the amount of files stored and how files are accessd the folder structure can be changed. !Use this function with care! }
 
-\usage{organiseStructure(LocalArcPath,HdfName,to,remove=TRUE)}
+\usage{orgSTRUC(LocalArcPath,HdfName,to,remove=TRUE)}
 
 \arguments{
   \item{LocalArcPath}{Character. Local path to look for and to download MODIS files. If missing the default archive "~/MODIS_ARC/" (under LINUX) is used.}
@@ -42,10 +42,10 @@
 
 \examples{
 # MOVE all MODIS grid data to a MODIS data pool like structure
-# organiseStructure(to=3,remove=TRUE)
+# orgSTRUC(to=3,remove=TRUE)
 
 # COPY all MOD13Q1 to folder "/LocalArcPath/MOD13Q1.collection/"
-# organiseStructure(HdfName="MOD13Q1",to=1,remove=FALSE)
+# orgSTRUC(HdfName="MOD13Q1",to=1,remove=FALSE)
 }
 
 
