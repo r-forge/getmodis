@@ -2,23 +2,25 @@
 # Date : July 2011
 # Version 0.2
 # Licence GPL v3
-
-# TODO arcPath: 'simple' files are stored by Product, 'complex' files are stored in ftp-like structure
   
 getHDF <- function(LocalArcPath,HdfName,product,startdate,enddate,tileH,tileV,extent,collection,quiet=FALSE,wait=1,checkXML=FALSE) {
 
 if (wait > 0){require(audio)} # waiting seams to decrease the chance of ftp rejection!
 
 if (missing(LocalArcPath)) {
-	if (.Platform$OS.type == "unix") {
-		LocalArcPath <- path.expand("~/MODIS_ARC")
+	if (.Platform$OS.type == "unix") {slashes <- "/"}else{slashes <- "\\"}
+		LocalArcPath <- "~/"
+		LocalArcPath <- normalizePath(path.expand(LocalArcPath), winslash = slashes)
+		LocalArcPath <- paste(LocalArcPath,"MODIS_ARC",sep="")
+		dir.create(LocalArcPath,showWarnings=FALSE)
 		cat(paste("No arichive path set, using/creating standard archive in: ",LocalArcPath,"\n",sep=""))
 		flush.console()
-		} else {
-		stop("Set aprorpiate 'LocalArcPath'")
-	}
+	#	} else {
+	#	stop("Set aprorpiate 'LocalArcPath'")
+	#}
 }
-LocalArcPath <- paste(strsplit(LocalArcPath,"/")[[1]],collapse="/")# removes "/" on last position (if present)
+LocalArcPath <- paste(strsplit(LocalArcPath,"/")[[1]],collapse=slashes)# removes "/" on last position (if present)
+LocalArcPath <- paste(strsplit(LocalArcPath,"\\\\")[[1]],collapse=slashes)# removes "/" on last position (if present)
 
 dir.create(LocalArcPath,showWarnings=FALSE)
 # test local LocalArcPath
@@ -47,14 +49,14 @@ if (!missing(HdfName)){
 	date <- format(as.Date(as.numeric(substr(date,5,7))-1,origin=paste(substr(date,1,4),"-01-01",sep="")),"%Y.%m.%d")
 	collection <- secName[4]
 
-	arcPath <- paste(secName[1],".",collection,"/",date,"/",sep="")
-	dir.create(paste(LocalArcPath,"/",arcPath,sep=""),recursive=TRUE,showWarnings=FALSE) # this always generates the same structure as the original ftp (this makes sense if the local LocalArcPath becomes big!)
+	arcPath <- paste(secName[1],".",collection,slashes,date,slashes,sep="")
+	dir.create(paste(LocalArcPath,slashes,arcPath,sep=""),recursive=TRUE,showWarnings=FALSE) # this always generates the same structure as the original ftp (this makes sense if the local LocalArcPath becomes big!)
 	
 		if (!file.exists(paste(LocalArcPath,"/",arcPath,HdfName[i],sep=""))) {
 		    require(RCurl)
 			download.file(
 				paste("ftp://e4ftl01u.ecs.nasa.gov/",PF1,"/", arcPath,HdfName[i],sep=""),
-				destfile=paste(LocalArcPath, arcPath,HdfName[i],sep=""),
+				destfile=paste(LocalArcPath,arcPath,HdfName[i],sep=""),
 				mode='wb', method='wget', quiet=quiet, cacheOK=FALSE)
 			
 			if (wait!=0) {wait(wait)}
@@ -142,7 +144,8 @@ for(z in 1:length(PF1)){ # Platforms MOD/MYD
 	ftp <- paste("ftp://e4ftl01u.ecs.nasa.gov/", PF1[z],"/", PF2[z],PD,".",collection,"/",sep="")
 
 	require(RCurl) # the function doesn't start if it isn't able to check the ftpserver on entering... TODO force FTPcheck=FALSE
-	FtpDayDirs  <- strsplit(getURL(ftp), "\n")[[1]] # its important to minimise getURL() queries, every check = risk of FTP breack + much time!
+	FtpDayDirs  <- getURL(ftp)
+  FtpDayDirs  <- unlist(strsplit(FtpDayDirs[[1]], if(.Platform$OS.type=="unix"){"\n"}else{"\r\n"})) # its important to minimise getURL() queries, every check = risk of FTP break + much time!
 		if (wait > 0){wait(as.numeric(wait))}
 
 	FtpDayDirs  <- FtpDayDirs[substr(FtpDayDirs, 1, 1)=='d'] # removes not usable folders i.e the first: "total 34128"
@@ -166,7 +169,7 @@ for(z in 1:length(PF1)){ # Platforms MOD/MYD
 		mtr  <- rep(1,ntiles) # for file situation flaging
 
 # creates local directory (HDF file container)
-arcPath <- paste(LocalArcPath,"/",PF2[z],PD,".",collection,"/",dates[[z]][i,1],"/",sep="")
+arcPath <- paste(LocalArcPath,slashes,PF2[z],PD,".",collection,slashes,dates[[z]][i,1],slashes,sep="")
 dir.create(arcPath,showWarnings=FALSE,recursive=TRUE)
 
 for(j in 1:ntiles){
@@ -196,7 +199,9 @@ if (sum(mtr)!=0) { # if one or more of the tiles in date is missing, its necessa
 	ftpfiles <- strsplit(ftpfiles, if(.Platform$OS.type=="unix"){"\n"} else{"\r\n"})[[1]]
 		if (wait > 0){wait(as.numeric(wait))}
 
-	if (ftpfiles[1] != "total 0") {ftpfiles <- unlist(lapply(strsplit(ftpfiles," "),function(x){x[length(x)]})) # found empty dir!
+	if (ftpfiles[1] != "total 0") {
+    
+    ftpfiles <- unlist(lapply(strsplit(ftpfiles," "),function(x){x[length(x)]})) # found empty dir!
 	
 		for(j in 1:ntiles){
 		
@@ -221,8 +226,8 @@ if (sum(mtr)!=0) { # if one or more of the tiles in date is missing, its necessa
 	dates[[z]][i,(j+1):ncol(dates[[z]])] <- "No files for that date on FTP"} # on ftp is possible to find empty folders!
 }
 
-dir.create(paste(LocalArcPath,"LOGS/",sep=""),showWarnings=FALSE)	
-write.csv(dates[[z]],file=paste(LocalArcPath,"LOGS/",PF2[z],PD,"_",collection,"_CECK.csv",sep=""))
+dir.create(paste(LocalArcPath,slashes,"LOGS",slashes,sep=""),showWarnings=FALSE)	
+write.csv(dates[[z]],file=paste(LocalArcPath,slashes,"LOGS",slashes,PF2[z],PD,"_",collection,"_CHECK.csv",sep=""))
 
 if(checkXML){xml <-  getXML(HdfName = list(paste(arcPath,dates[[z]][i,-1],sep="")),wait=wait)} # list() should not be needed
 
