@@ -1,26 +1,31 @@
-# Author: Matteo Mattiuzzi, matteo.mattiuzzi@boku.ac.at
+# Author: Matteo Mattiuzzi, Anja Klisch, matteo.mattiuzzi@boku.ac.at
 # Date : July 2011
 # Version 0.2
 # Licence GPL v3
   
+
 getHDF <- function(LocalArcPath,HdfName,product,startdate,enddate,tileH,tileV,extent,collection,quiet=FALSE,wait=1,checkXML=FALSE) {
 
 if (wait > 0){require(audio)} # waiting seams to decrease the chance of ftp rejection!
 
-if (missing(LocalArcPath)) {
-	if (.Platform$OS.type == "unix") {slashes <- "/"}else{slashes <- "\\"}
-		LocalArcPath <- "~/"
-		LocalArcPath <- normalizePath(path.expand(LocalArcPath), winslash = slashes)
-		LocalArcPath <- paste(LocalArcPath,"MODIS_ARC",sep="")
-		dir.create(LocalArcPath,showWarnings=FALSE)
-		cat(paste("No arichive path set, using/creating standard archive in: ",LocalArcPath,"\n",sep=""))
-		flush.console()
-	#	} else {
-	#	stop("Set aprorpiate 'LocalArcPath'")
-	#}
+if (.Platform$OS.type == "unix") {
+	slashes <- "/"
+	ssplit <- slashes
+}else{
+	slashes <- "\\"
+	ssplit <- "\\\\"
 }
-LocalArcPath <- paste(strsplit(LocalArcPath,"/")[[1]],collapse=slashes)# removes "/" on last position (if present)
-LocalArcPath <- paste(strsplit(LocalArcPath,"\\\\")[[1]],collapse=slashes)# removes "/" on last position (if present)
+
+if (missing(LocalArcPath)) {
+	LocalArcPath <- "~/"
+	LocalArcPath <- normalizePath(path.expand(LocalArcPath), winslash = slashes)
+	LocalArcPath <- paste(strsplit(LocalArcPath,ssplit)[[1]],collapse=slashes)# removes "/" or "//" on last position (if present)
+	LocalArcPath <- paste(LocalArcPath,slashes,"MODIS_ARC",sep="")
+	cat(paste("No archive path set, using/creating standard archive in: ",LocalArcPath,"\n",sep=""))
+	flush.console()
+}
+
+LocalArcPath <- paste(strsplit(LocalArcPath,ssplit)[[1]],collapse=slashes)# removes "/" or "//" on last position (if present)
 
 dir.create(LocalArcPath,showWarnings=FALSE)
 # test local LocalArcPath
@@ -52,11 +57,12 @@ if (!missing(HdfName)){
 	arcPath <- paste(secName[1],".",collection,slashes,date,slashes,sep="")
 	dir.create(paste(LocalArcPath,slashes,arcPath,sep=""),recursive=TRUE,showWarnings=FALSE) # this always generates the same structure as the original ftp (this makes sense if the local LocalArcPath becomes big!)
 	
-		if (!file.exists(paste(LocalArcPath,"/",arcPath,HdfName[i],sep=""))) {
+		if (!file.exists(paste(LocalArcPath,slashes,arcPath,HdfName[i],sep=""))) {
 		    require(RCurl)
-			download.file(
-				paste("ftp://e4ftl01u.ecs.nasa.gov/",PF1,"/", arcPath,HdfName[i],sep=""),
-				destfile=paste(LocalArcPath,arcPath,HdfName[i],sep=""),
+				ftpPath <- paste("ftp://e4ftl01u.ecs.nasa.gov/",PF1,"/", secName[1],".",collection,"/",date,"/",HdfName[i],sep="")
+	download.file(
+				ftpPath,
+				destfile=paste(LocalArcPath,slashes,arcPath,HdfName[i],sep=""),
 				mode='wb', method='wget', quiet=quiet, cacheOK=FALSE)
 			
 			if (wait!=0) {wait(wait)}

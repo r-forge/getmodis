@@ -2,23 +2,31 @@
 # Date: August 2011
 # Licence GPL v3
 
-organiseStructure <- function(LocalArcPath,HdfName,to,remove=TRUE) {
+orgSTRUC <- function(LocalArcPath,HdfName,to,remove=TRUE) {
 
 
 if (missing(to)|(!to %in% 1:3)) stop("Provide a valid 'to' argument!")
 
-if (missing(LocalArcPath)) {
-	if (.Platform$OS.type == "unix") {
-		LocalArcPath <- path.expand("~/MODIS_ARC")
-		dir.create(LocalArcPath,showWarnings = FALSE)
-		cat(paste("\nNo arichive path set, looking in: ",LocalArcPath,"\n\n",sep=""))
-		flush.console()
-		} else {
-		stop("'LocalArcPath' not set properly")
-	}
-}
-LocalArcPath <- paste(strsplit(LocalArcPath,"/")[[1]],collapse="/")# removes "/" on last position (if present)
+#if (.Platform$OS.type == "unix") {
+	slashes <- "/"
+	ssplit <- slashes
+#}else{
+#	slashes <- "\\"
+#	ssplit <- "\\\\"
+#}
 
+if (missing(LocalArcPath)) {
+	LocalArcPath <- "~/"
+	LocalArcPath <- normalizePath(path.expand(LocalArcPath), winslash = slashes)
+	LocalArcPath <- paste(strsplit(LocalArcPath,ssplit)[[1]],collapse=slashes)# removes "/" or "//" on last position (if present)
+	LocalArcPath <- paste(LocalArcPath,slashes,"MODIS_ARC",sep="")
+	cat(paste("No archive path set, using/creating standard archive in: ",LocalArcPath,"\n",sep=""))
+	flush.console()
+}
+
+LocalArcPath <- paste(strsplit(LocalArcPath,ssplit)[[1]],collapse=slashes)# removes "/" or "//" on last position (if present)
+
+dir.create(LocalArcPath,showWarnings=FALSE)
 # test local LocalArcPath
 try(testDir <- list.dirs(LocalArcPath),silent=TRUE)
 	if(!exists("testDir")) {stop("'LocalArcPath' not set properly")} 
@@ -32,12 +40,13 @@ if(!missing(HdfName)) {
 	} else {
 		avFiles <- unlist(list.files(LocalArcPath,pattern="hdf",recursive=TRUE,full.names=TRUE))
 	}
+avFiles <- unlist(gsub("/",ssplit,avFiles)) # treats slashes according to platform
 
 data("MODIS_Products")
 
-# tests if MODIS-grid file(s) # mayve using regex methods it becomes much faster!
+# tests if MODIS-grid file(s) # maybe using regex methods it becomes much faster!
 doit <- sapply(avFiles,function(x) {
-	name <- strsplit(x,"/")[[1]] # separate name from path
+	name <- strsplit(x,ssplit)[[1]] # separate name from path
 	name <- name[length(name)] # select filename
 	secName  <- strsplit(name,"\\.")[[1]] # decompose filename
 
@@ -63,11 +72,11 @@ cat("Found",length(avFiles),"files \n")
 #########################
 moved <- sapply(avFiles,function(x) {
 
-	name   <- strsplit(x,"/")[[1]] # separate name from path
-	orpath <- name[-length(name)]
-	orpath <- paste(orpath,collapse="/")
-	name   <- name[length(name)] # select filename
-	secName  <- strsplit(name,"\\.")[[1]] # decompose filename
+name   <- strsplit(x,ssplit)[[1]] # separate name from path
+orpath <- name[-length(name)]
+orpath <- paste(orpath,collapse=slashes)
+name   <- name[length(name)] # select filename
+secName  <- strsplit(name,"\\.")[[1]] # decompose filename
 
 ########################
 # generate structure
@@ -78,41 +87,39 @@ date    <- as.Date(as.numeric(substr(date,5,nchar(date)))-1,origin=paste(substr(
 year    <- format(date,format="%Y")
 date    <- gsub(x=date,"-",".")
 
-if (to==1) {path <- paste(LocalArcPath,"/",basedir,sep="")}
-if (to==2) {path <- paste(LocalArcPath,"/",basedir,"/",year,sep="")}
-if (to==3) {path <- paste(LocalArcPath,"/",basedir,"/",date,sep="")}
+if (to==1) {path <- paste(LocalArcPath,slashes,basedir,sep="")}
+if (to==2) {path <- paste(LocalArcPath,slashes,basedir,slashes,year,sep="")}
+if (to==3) {path <- paste(LocalArcPath,slashes,basedir,slashes,date,sep="")}
 
 dir.create(path,showWarnings=FALSE,recursive=TRUE)
 ###################
 # move files
 
-if (!file.exists(paste(path,"/",name,sep=""))) { # do nothing if file is already in dest dir 
+if (!file.exists(paste(path,slashes,name,sep=""))) { # do nothing if file is already in dest dir 
 	if (.Platform$OS.type == "unix" & remove) {
 		system(paste("mv ",x," ",path,sep=""))
 		moved <- 1
 	} else if (.Platform$OS.type == "windows" & remove) {
-		system(paste("move ",x," ", path,sep=""))
+		shell(paste("move ",x," ", path,sep=""),intern=T)
 		moved <- 1
 	} else {
 		file.copy(from=x,to=paste(path,"/",name,sep=""),overwrite=FALSE)
-		move <- 2
+		moved <- 2
 		
 		if (file.exists(paste(path,"/",name,sep="")) & orpath!=path & remove) {
 			unlink(paste(orpath,name,sep=""))
-		move <- 1
+		moved <- 1
 		}
 		
 	}
 }  else { moved <- 0 }
-if (length(list.files(orpath))==0) {unlink(orpath,recursive=TRUE)} # if dir is empty delete it
-return(moved)
-})
+if (length(list.files(orpath))==0) {unlink(orpath,recursive=TRUE)} # delete emty dir
+return(moved)})
 
 cat("Moved ", sum(moved==1)," files!\n")
 cat("Copied ", sum(moved==2)," files!\n")
 cat("Not moved ", sum(moved==0)," files!\n")
 
 }
-########################
-
+#######################
 
