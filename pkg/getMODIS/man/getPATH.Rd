@@ -9,9 +9,11 @@
 \description{
   If PATH variable to MRT is not set, this function tries }
 
-\usage{getPATH()}
+\usage{getPATH(quiet=FALSE)}
 
-\arguments{}
+\arguments{
+  \item{quiet}{Logical. if run inside an other function use \code{quiet=TRUE}. Probably this function will become internal...}
+}
 
 \value{
   Absolute path to MRT
@@ -26,9 +28,8 @@
 }
 
 \examples{
-
+getPATH(quiet=TRUE)
 getPATH()
-
 }
 
 
