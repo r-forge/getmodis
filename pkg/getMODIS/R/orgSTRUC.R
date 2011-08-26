@@ -35,6 +35,8 @@ if(!missing(HdfName)) {
 		avFiles <- unlist(list.files(LocalArcPath,pattern="hdf",recursive=TRUE,full.names=TRUE))
 	}
 
+if (length(avFiles)==0) {stop("No HDF or HDF.XML files found! Maybe check 'LocalArcPath'\n")}
+ 
 data("MODIS_Products")
 
 # tests if MODIS-grid file(s) # maybe using regex methods it becomes much faster!
