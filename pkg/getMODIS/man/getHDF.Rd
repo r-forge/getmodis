@@ -21,7 +21,7 @@
 
 \arguments{
 
-  \item{LocalArcPath}{Character. Local path to look for and to download MODIS files. If missing the default archive "~/MODIS_ARC/" (under LINUX) is used.}
+  \item{LocalArcPath}{Character. Local path to look for and to download MODIS files.  If missing the default archive '~/MODIS_ARC/' (LINUX), 'C:/Documents and Settings/username/My Documents/MODIS_ARC/' (Windows XP) and 'C:/Users/username/Documents/MODIS_ARC' (Vista/Windows 7) is used.}
 
   \item{HdfName}{Character (vector or list). Full HDF file name(s) to download. If just few single (AND known!) files should be downloaded use \code{HdfName}. If \code{HdfName} is provided the other file-related parameters are ignored: \code{startdate, enddate, collection, tileV,...}. If many files have to be checked and downloaded it is simpler, safer and faster to use following parameters.}
 
