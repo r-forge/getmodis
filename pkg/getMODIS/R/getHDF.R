@@ -136,25 +136,35 @@ if (substr(PD,3,nchar(PD))=="CMG") {
 	ntiles <- length(tileID)
 }
 
-dirALL <- list()
+auxPATH <- file.path(LocalArcPath,".auxiliaries",fsep=fsep)
+
 dates  <- list()
 
 for(z in 1:length(PF1)){ # Platforms MOD/MYD
 
-	ftp <- paste("ftp://e4ftl01u.ecs.nasa.gov/", PF1[z],"/", PF2[z],PD,".",collection,"/",sep="")
+	productName <- paste(PF2[z],PD,sep="")
+	
+	ftp <- paste("ftp://e4ftl01u.ecs.nasa.gov/", PF1[z],"/", productName,".",collection,"/",sep="")
 
-	require(RCurl) # the function doesn't start if it isn't able to check the ftpserver on entering... TODO force FTPcheck=FALSE
-	FtpDayDirs  <- getURL(ftp)
-  FtpDayDirs  <- unlist(strsplit(FtpDayDirs[[1]], if(.Platform$OS.type=="unix"){"\n"}else{"\r\n"})) # its important to minimise getURL() queries, every check = risk of FTP break + much time!
+#	require(RCurl) # the function doesn't start if it isn't able to check the ftpserver on entering... TODO force FTPcheck=FALSE
+#	FtpDayDirs  <- getURL(ftp)
+
+	invisible(getSTRUC(LocalArcPath=LocalArcPath,product=productName,collection=collection,startdate=startdate,enddate=enddate,wait=0))
+	
+
+  #FtpDayDirs  <- unlist(strsplit(FtpDayDirs[[1]], if(.Platform$OS.type=="unix"){"\n"}else{"\r\n"})) # its important to minimise getURL() queries, every check = risk of FTP break + much time!
 		if (wait > 0){wait(as.numeric(wait))}
 
-	FtpDayDirs  <- FtpDayDirs[substr(FtpDayDirs, 1, 1)=='d'] # removes not usable folders i.e the first: "total 34128"
-	dirALL[[z]] <- unlist(lapply(strsplit(FtpDayDirs, " "), function(x){x[length(x)]})) # dir name below ftp
+#	FtpDayDirs  <- FtpDayDirs[substr(FtpDayDirs, 1, 1)=='d'] # removes not usable folders i.e the first: "total 34128"
 
-	sel <- as.Date(dirALL[[z]],format="%Y.%m.%d") # convert to date
+	FtpDayDirs <- read.table(file.path(auxPATH, "ftpdir.txt", fsep = fsep), stringsAsFactors = FALSE)
+	FtpDayDirs <- FtpDayDirs[,which(colnames(FtpDayDirs)==paste(productName,".",collection,sep=""))] 
+	FtpDayDirs <- FtpDayDirs[!is.na(FtpDayDirs)]
+	
+	sel <- as.Date(FtpDayDirs,format="%Y.%m.%d") # convert to date
 	us  <- sel >= begin & sel <= end
-	if (sum(us)>0){ 
-	dates[[z]] <- dirALL[[z]][us]
+	if (sum(us,na.rm=TRUE)>0){ 
+	dates[[z]] <- FtpDayDirs[us]
 
 	dates[[z]] <- cbind(dates[[z]],matrix(rep(NA, length(dates[[z]])*ntiles),ncol=ntiles,nrow=length(dates[[z]])))
 	colnames(dates[[z]]) <- c("date",tileID)
