@@ -26,7 +26,6 @@ dir.create(auxPATH,showWarnings=FALSE)
 # Check Platform and product
 PF <- substr(product,2,2)
 
-#TODO if MCD, PF1 == "MOTA")
 if 	  (PF %in% c("x","X")) { PF1  <- c("MOLT", "MOLA"); PF2  <- c("MOD", "MYD") 
 } else if (PF %in% c("y","Y")) { PF1  <- "MOLA"; PF2 <- "MYD"
 } else if (PF %in% c("o","O")) { PF1  <- "MOLT"; PF2 <- "MOD"
@@ -43,14 +42,16 @@ collection <- sprintf("%03d",as.numeric(collection))
 if (file.exists(file.path(auxPATH,"ftpdir.txt",fsep=fsep))) {
 	ftpdirs <- read.table(file.path(auxPATH,"ftpdir.txt",fsep=fsep),stringsAsFactors=FALSE)
 	} else {
-	ftpdirs <- list()
+	ftpdirs <- data.frame()
 	}
 	
+data("MODIS_Products")
 
-# validity check 2
 for (i in 1:length(PF2)){
 	
 	productName <- paste(PF2[i],PD, ".",collection,sep="")
+
+	if (!paste(PF2[i],PD,sep="") %in% MODIS_Products[,1]) {stop(PF2[i],PD," is an unkown product\n",sep="")}
 	
 		if (productName %in% names(ftpdirs)) {
 			createNew <- FALSE
@@ -110,13 +111,17 @@ for (i in 1:length(PF2)){
 		FtpDayDirs <- ftpdirs[,ind]
 	}
 
-	if (createNew) { 
+	if (createNew) {
 		FtpDayDirs <- matrix(FtpDayDirs)
-		mtr <- matrix(NA,ncol=ncol(ftpdirs)+1,nrow=max(dim(FtpDayDirs)[1],dim(ftpdirs)[1]))
-		colnames(mtr) <- c(colnames(ftpdirs),productName)	
-			for(j in 1:ncol(ftpdirs)){
-				mtr[,j] <- replace(mtr[,j], 1:length(ftpdirs[,j]),ftpdirs[,j])
+		mtr <- matrix(NA,ncol=ncol(ftpdirs)+1,nrow=max(length(FtpDayDirs),dim(ftpdirs)[1]))
+		colnames(mtr) <- if(ncol(ftpdirs)>0){c(colnames(ftpdirs),productName)} else {productName}	
+			
+			if (ncol(ftpdirs)!=0){ # relevant only for t
+				for(j in 1:ncol(ftpdirs)){
+					mtr[,j] <- replace(mtr[,j], 1:nrow(ftpdirs),ftpdirs[,j])
+				}
 			}
+			
 		mtr[,ncol(mtr)] <- replace(mtr[,ncol(mtr)], 1:length(FtpDayDirs),FtpDayDirs) 
 		ftpdirs <- mtr
 	}
