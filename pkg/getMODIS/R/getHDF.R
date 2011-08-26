@@ -146,16 +146,8 @@ for(z in 1:length(PF1)){ # Platforms MOD/MYD
 	
 	ftp <- paste("ftp://e4ftl01u.ecs.nasa.gov/", PF1[z],"/", productName,".",collection,"/",sep="")
 
-#	require(RCurl) # the function doesn't start if it isn't able to check the ftpserver on entering... TODO force FTPcheck=FALSE
-#	FtpDayDirs  <- getURL(ftp)
-
 	invisible(getSTRUC(LocalArcPath=LocalArcPath,product=productName,collection=collection,startdate=startdate,enddate=enddate,wait=0))
-	
-
-  #FtpDayDirs  <- unlist(strsplit(FtpDayDirs[[1]], if(.Platform$OS.type=="unix"){"\n"}else{"\r\n"})) # its important to minimise getURL() queries, every check = risk of FTP break + much time!
 		if (wait > 0){wait(as.numeric(wait))}
-
-#	FtpDayDirs  <- FtpDayDirs[substr(FtpDayDirs, 1, 1)=='d'] # removes not usable folders i.e the first: "total 34128"
 
 	FtpDayDirs <- read.table(file.path(auxPATH, "ftpdir.txt", fsep = fsep), stringsAsFactors = FALSE)
 	FtpDayDirs <- FtpDayDirs[,which(colnames(FtpDayDirs)==paste(productName,".",collection,sep=""))] 
@@ -169,7 +161,7 @@ for(z in 1:length(PF1)){ # Platforms MOD/MYD
 	dates[[z]] <- cbind(dates[[z]],matrix(rep(NA, length(dates[[z]])*ntiles),ncol=ntiles,nrow=length(dates[[z]])))
 	colnames(dates[[z]]) <- c("date",tileID)
 
-#### check archive... download
+
 	for (i in 1:nrow(dates[[z]])){
 
 		year <- format(as.Date(dates[[z]][i,1],format="%Y.%m.%d"), "%Y")
