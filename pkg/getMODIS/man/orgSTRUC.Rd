@@ -8,16 +8,16 @@
 
 \description{This function changes the storage structure (see details). Depending on the amount of files stored and how files are accessd the folder structure can be changed. !Use this function with care! }
 
-\usage{orgSTRUC(LocalArcPath,HdfName,to,remove=TRUE)}
+\usage{orgSTRUC(LocalArcPath,HdfName,to,move=TRUE)}
 
 \arguments{
-  \item{LocalArcPath}{Character. Local path to look for and to download MODIS files. If missing the default archive "~/MODIS_ARC/" (under LINUX) is used.}
+  \item{LocalArcPath}{Character. Local path to look for MODIS files. If missing the default archive "~/MODIS_ARC/" (under LINUX), c:/Documents and settings/user/./MODIS_ARC/ (Windows XP) and c:.../myDocuments/MODIS_ARC/"(Windows 7) is used.}
 
  \item{HdfName}{Character. Regular expression (passed to ?list.files) for file matching. If missing, all local MODIS grid data under \code{LocalArcPath} is considered.}
 
- \item{to}{Integer between 1 and 3}
+ \item{to}{Integer between \code{1} and \code{3}}
 
- \item{remove}{Logical. Default is \code{TRUE}, this means that files after copied are deleted (what basically 'move.file' sould do! But I did not found that function!). It \code{FALSE},files are copied and not moved!}
+ \item{move}{Logical. Default is \code{TRUE}, this means that files are moved and multiple files are deleted. It \code{FALSE},files are just copied and remain in origin folder!}
 }
 
 \details{
@@ -42,10 +42,10 @@
 
 \examples{
 # MOVE all MODIS grid data to a MODIS data pool like structure
-# orgSTRUC(to=3,remove=TRUE)
+# orgSTRUC(to=3,move=TRUE)
 
 # COPY all MOD13Q1 to folder "/LocalArcPath/MOD13Q1.collection/"
-# orgSTRUC(HdfName="MOD13Q1",to=1,remove=FALSE)
+# orgSTRUC(HdfName="MOD13Q1",to=1,move=FALSE)
 }
 
 
