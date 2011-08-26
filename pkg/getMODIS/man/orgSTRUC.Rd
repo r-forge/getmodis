@@ -11,7 +11,7 @@
 \usage{orgSTRUC(LocalArcPath,HdfName,to,move=TRUE)}
 
 \arguments{
-  \item{LocalArcPath}{Character. Local path to look for MODIS files. If missing the default archive "~/MODIS_ARC/" (under LINUX), c:/Documents and settings/user/./MODIS_ARC/ (Windows XP) and c:.../myDocuments/MODIS_ARC/"(Windows 7) is used.}
+  \item{LocalArcPath}{Character. Local path to look for MODIS files. If missing the default archive "~/MODIS_ARC/" (LINUX), "C:\Documents and Settings\username\My Documents\MODIS_ARC\" (Windows XP) and "C:\Users\username\Documents" (Vista/Windows 7) is used.}
 
  \item{HdfName}{Character. Regular expression (passed to ?list.files) for file matching. If missing, all local MODIS grid data under \code{LocalArcPath} is considered.}
 
