@@ -8,29 +8,23 @@ getHDF <- function(LocalArcPath,HdfName,product,startdate,enddate,tileH,tileV,ex
 
 if (wait > 0){require(audio)} # waiting seams to decrease the chance of ftp rejection!
 
-if (.Platform$OS.type == "unix") {
-	slashes <- "/"
-	ssplit <- slashes
-}else{
-	slashes <- "\\"
-	ssplit <- "\\\\"
-}
+fsep <- .Platform$file.sep
 
 if (missing(LocalArcPath)) {
 	LocalArcPath <- "~/"
-	LocalArcPath <- normalizePath(path.expand(LocalArcPath), winslash = slashes)
-	LocalArcPath <- paste(strsplit(LocalArcPath,ssplit)[[1]],collapse=slashes)# removes "/" or "//" on last position (if present)
-	LocalArcPath <- paste(LocalArcPath,slashes,"MODIS_ARC",sep="")
+	LocalArcPath <- normalizePath(path.expand(LocalArcPath), winslash = fsep)
+	LocalArcPath <- paste(strsplit(LocalArcPath,fsep)[[1]],collapse=fsep)# removes "/" or "\" on last position (if present)
+	LocalArcPath <- file.path(LocalArcPath,"MODIS_ARC",fsep=fsep)
 	cat(paste("No archive path set, using/creating standard archive in: ",LocalArcPath,"\n",sep=""))
 	flush.console()
 }
 
-LocalArcPath <- paste(strsplit(LocalArcPath,ssplit)[[1]],collapse=slashes)# removes "/" or "//" on last position (if present)
+#LocalArcPath <- paste(strsplit(LocalArcPath,fsep)[[1]],collapse=fsep)# removes "/" or "//" on last position (if present)
 
 dir.create(LocalArcPath,showWarnings=FALSE)
 # test local LocalArcPath
 try(testDir <- list.dirs(LocalArcPath),silent=TRUE)
-	if(!exists("testDir")) {stop("'LocalArcPath' not set properly!")} 
+if(!exists("testDir")) {stop("'LocalArcPath' not set properly!")} 
 #################
 
 # if filename is provided other args are ignored (filename is ok for not too many files (because of high ftp-request frequency)
@@ -50,19 +44,19 @@ if (!missing(HdfName)){
 
 	if(PF == "MOD"){PF1 <- "MOLT"} else {PF1 <- "MOLA"}
 
-	date <- substr(secName[2],2,8)
-	date <- format(as.Date(as.numeric(substr(date,5,7))-1,origin=paste(substr(date,1,4),"-01-01",sep="")),"%Y.%m.%d")
+	fdate <- substr(secName[2],2,8)
+	fdate <- format(as.Date(as.numeric(substr(fdate,5,7))-1,origin=paste(substr(fdate,1,4),"-01-01",sep="")),"%Y.%m.%d")
 	collection <- secName[4]
 
-	arcPath <- paste(secName[1],".",collection,slashes,date,slashes,sep="")
-	dir.create(paste(LocalArcPath,slashes,arcPath,sep=""),recursive=TRUE,showWarnings=FALSE) # this always generates the same structure as the original ftp (this makes sense if the local LocalArcPath becomes big!)
+	arcPath <- paste(secName[1],".",collection,fsep,fdate,fsep,sep="")
+	dir.create(paste(LocalArcPath,fsep,arcPath,sep=""),recursive=TRUE,showWarnings=FALSE) # this always generates the same structure as the original ftp (this makes sense if the local LocalArcPath becomes big!)
 	
-		if (!file.exists(paste(LocalArcPath,slashes,arcPath,HdfName[i],sep=""))) {
+		if (!file.exists(paste(LocalArcPath,fsep,arcPath,HdfName[i],sep=""))) {
 		    require(RCurl)
-				ftpPath <- paste("ftp://e4ftl01u.ecs.nasa.gov/",PF1,"/", secName[1],".",collection,"/",date,"/",HdfName[i],sep="")
+				ftpPath <- paste("ftp://e4ftl01u.ecs.nasa.gov/",PF1,"/", secName[1],".",collection,"/",fdate,"/",HdfName[i],sep="")
 	download.file(
 				ftpPath,
-				destfile=paste(LocalArcPath,slashes,arcPath,HdfName[i],sep=""),
+				destfile=paste(LocalArcPath,fsep,arcPath,HdfName[i],sep=""),
 				mode='wb', method='wget', quiet=quiet, cacheOK=FALSE)
 			
 			if (wait!=0) {wait(wait)}
@@ -175,7 +169,7 @@ for(z in 1:length(PF1)){ # Platforms MOD/MYD
 		mtr  <- rep(1,ntiles) # for file situation flaging
 
 # creates local directory (HDF file container)
-arcPath <- paste(LocalArcPath,slashes,PF2[z],PD,".",collection,slashes,dates[[z]][i,1],slashes,sep="")
+arcPath <- paste(LocalArcPath,fsep,PF2[z],PD,".",collection,fsep,dates[[z]][i,1],fsep,sep="")
 dir.create(arcPath,showWarnings=FALSE,recursive=TRUE)
 
 for(j in 1:ntiles){
@@ -232,8 +226,8 @@ if (sum(mtr)!=0) { # if one or more of the tiles in date is missing, its necessa
 	dates[[z]][i,(j+1):ncol(dates[[z]])] <- "No files for that date on FTP"} # on ftp is possible to find empty folders!
 }
 
-dir.create(paste(LocalArcPath,slashes,"LOGS",slashes,sep=""),showWarnings=FALSE)	
-write.csv(dates[[z]],file=paste(LocalArcPath,slashes,"LOGS",slashes,PF2[z],PD,"_",collection,"_CHECK.csv",sep=""))
+dir.create(paste(LocalArcPath,fsep,"LOGS",fsep,sep=""),showWarnings=FALSE)	
+write.csv(dates[[z]],file=paste(LocalArcPath,fsep,"LOGS",fsep,PF2[z],PD,"_",collection,"_CHECK.csv",sep=""))
 
 if(checkXML){xml <-  getXML(HdfName = list(paste(arcPath,dates[[z]][i,-1],sep="")),wait=wait)} # list() should not be needed
 
