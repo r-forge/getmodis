@@ -1,6 +1,5 @@
 # Author: Matteo Mattiuzzi, Anja Klisch, matteo.mattiuzzi@boku.ac.at
 # Date : July 2011
-# Version 0.2
 # Licence GPL v3
   
 
@@ -19,15 +18,13 @@ if (missing(LocalArcPath)) {
 	flush.console()
 }
 
-#LocalArcPath <- paste(strsplit(LocalArcPath,fsep)[[1]],collapse=fsep)# removes "/" or "//" on last position (if present)
-
 dir.create(LocalArcPath,showWarnings=FALSE)
 # test local LocalArcPath
 try(testDir <- list.dirs(LocalArcPath),silent=TRUE)
 if(!exists("testDir")) {stop("'LocalArcPath' not set properly!")} 
 #################
 
-# if filename is provided other args are ignored (filename is ok for not too many files (because of high ftp-request frequency)
+# TODO HdfName as regex
 
 if (!missing(HdfName)){ 
 
@@ -73,49 +70,18 @@ if (missing(startdate)) {stop("Please provide a 'startdate' (format: 'YYYY.MM.DD
 if (missing(enddate))   {stop("Please provide a 'endate' (format: 'YYYY.MM.DD')")} 
 if (missing(extent) & (missing(tileH) | missing(tileV))){stop("Please provide eighter a 'tileH(s)' plus tileV(s) or an extent")} 
 if (missing(product))   {stop("Please provide the MODIS-'product'")}
-if (missing(collection)){stop("Please provide a product-'collection' (probably: '005')")} 
+#######
+# check product
 
+product <- getPRODUCT(product=product)
 
-# following variables will be activated when the packge is ready for that
-# interactiveExtent        <- FALSE # TODO
-forceFtpCheck <-  TRUE # TODO
-
-# Check Platform and product
-PF <- substr(product,2,2)
-
-#TODO if MCD, PF1 == "MOTA")
-if 	  (PF %in% c("x","X")) { PF1  <- c("MOLT", "MOLA"); PF2  <- c("MOD", "MYD") 
-} else if (PF %in% c("y","Y")) { PF1  <- "MOLA"; PF2 <- "MYD"
-} else if (PF %in% c("o","O")) { PF1  <- "MOLT"; PF2 <- "MOD"
-} else if (PF %in% c("c","C")) { PF1  <- "MOTA"; PF2 <- "MCD"
-} else {stop("Check 'product', the Platform specific part seams wrong. Not one of 'MOD','MYD','MXD','MCD'.")
-}
-
-
-# Check product
-PD <- substr(product,4,nchar(product)) #'09Q1',...
-#####
-# collection
-collection <- sprintf("%03d",collection)
-
-data("MODIS_Products")
-
-# validy check and information
-for (i in 1:length(PF2)){
-
-	if (paste(PF2[i],PD,sep="") %in% MODIS_Products[,1]) {
-	ind <- which(MODIS_Products[,1] == paste(PF2[i],PD,sep=""))
-
-if(as.character(MODIS_Products[ind,4])=="Swath"){stop(paste("You are looking for a '",as.character(MODIS_Products[ind,4]),"' product, only 'tile' data is supported yet!",sep=""))
-		} else { 
-		if(i == 1){cat("\n")} else {cat("and\n")}
-		cat(paste("You are looking for ", as.character(MODIS_Products[ind,1])," collection ",collection,", the ",as.character(MODIS_Products[ind,6])," ",as.character(MODIS_Products[ind,3])," product from ",as.character(MODIS_Products[ind,2])," with a ground resolution of ",as.character(MODIS_Products[ind,5]),"\n",sep=""))
-		}
+# check collection
+if (missing(collection)) {
+	collection <- getCOLLECTION(product=product)
 	} else {
-	cat(paste("No product found with the name ",PF2[i],PD,sep=""))}
-}
-cat("\n")
-
+	collection <- sprintf("%03d",as.numeric(collection))
+	if (!getCOLLECTION(product=product,collection=collection)) {stop(paste("The collection you have requested may doesn't exist run: 'getCOLLECTION(LocalArcPath='",LocalArcPath,"',product='",product$request ,"',forceCheck=TRUE,newest=FALSE)' to update internal list and see available once!",sep=""))}
+	}
 
 #### convert dates 
 begin   <- as.Date(startdate,format="%Y.%m.%d")
@@ -124,7 +90,7 @@ end     <- as.Date(enddate,format="%Y.%m.%d")
 if (is.na(end)) {stop("\n'enddate=",enddate,"' is eighter wrong format (not:'YYYY.MM.DD') or a invalid date")}
 ####
 # tileID
-if (substr(PD,3,nchar(PD))=="CMG") {
+if (substr(product$PD,3,nchar(product$PD))=="CMG") {
 	tileID="GLOBAL"
 	ntiles=1 
 	} else {
@@ -140,11 +106,11 @@ auxPATH <- file.path(LocalArcPath,".auxiliaries",fsep=fsep)
 
 dates  <- list()
 
-for(z in 1:length(PF1)){ # Platforms MOD/MYD
+for(z in 1:length(product$PF1)){ # Platforms MOD/MYD
 
-	productName <- paste(PF2[z],PD,sep="")
+	productName <- product$productName[z]
 	
-	ftp <- paste("ftp://e4ftl01u.ecs.nasa.gov/", PF1[z],"/", productName,".",collection,"/",sep="")
+	ftp <- paste("ftp://e4ftl01u.ecs.nasa.gov/", product$PF1[z],"/", productName,".",collection,"/",sep="")
 
 	invisible(getSTRUC(LocalArcPath=LocalArcPath,product=productName,collection=collection,startdate=startdate,enddate=enddate,wait=0))
 		if (wait > 0){wait(as.numeric(wait))}
@@ -171,12 +137,12 @@ for(z in 1:length(PF1)){ # Platforms MOD/MYD
 		mtr  <- rep(1,ntiles) # for file situation flaging
 
 # creates local directory (HDF file container)
-arcPath <- paste(LocalArcPath,fsep,PF2[z],PD,".",collection,fsep,dates[[z]][i,1],fsep,sep="")
+arcPath <- paste(LocalArcPath,fsep,product$PF2[z],product$PD,".",collection,fsep,dates[[z]][i,1],fsep,sep="")
 dir.create(arcPath,showWarnings=FALSE,recursive=TRUE)
 
 for(j in 1:ntiles){
 
-dates[[z]][i,j+1] <- paste(PF2[z],PD,".",datu,".",if (tileID[j]!="GLOBAL") {paste(tileID[j],".",sep="")},collection,".*.hdf$",sep="") # create pattern
+dates[[z]][i,j+1] <- paste(product$PF2[z],product$PD,".",datu,".",if (tileID[j]!="GLOBAL") {paste(tileID[j],".",sep="")},collection,".*.hdf$",sep="") # create pattern
 	
 	if (length(dir(arcPath,pattern=dates[[z]][i,j+1]))>0){ # if available locally
 		
@@ -229,12 +195,12 @@ if (sum(mtr)!=0) { # if one or more of the tiles in date is missing, its necessa
 }
 
 dir.create(paste(LocalArcPath,fsep,"LOGS",fsep,sep=""),showWarnings=FALSE)	
-write.csv(dates[[z]],file=paste(LocalArcPath,fsep,"LOGS",fsep,PF2[z],PD,"_",collection,"_CHECK.csv",sep=""))
+write.csv(dates[[z]],file=paste(LocalArcPath,fsep,"LOGS",fsep,product$PF2[z],product$PD,"_",collection,"_CHECK.csv",sep=""))
 
 if(checkXML){xml <-  getXML(HdfName = list(paste(arcPath,dates[[z]][i,-1],sep="")),wait=wait)} # list() should not be needed
 
 } # end dates i 
-}else{ cat(paste("No files on ftp in date range for: ",PF2[z],PD,".",collection,"\n\n",sep=""))  }
+}else{ cat(paste("No files on ftp in date range for: ",product$PF2[z],product$PD,".",collection,"\n\n",sep=""))  }
 } # if no files are avalable for product in date AND end platform z
 } # end if not HdfName 
 } ## END: FTP vs ARC check and download 

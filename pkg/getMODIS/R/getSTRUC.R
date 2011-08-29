@@ -5,8 +5,6 @@
 
 getSTRUC <- function(LocalArcPath,product,collection,startdate,enddate,wait=1) {
 
-
-
 fsep <- .Platform$file.sep
 
 if (missing(LocalArcPath)) {
@@ -24,19 +22,16 @@ auxPATH <- file.path(LocalArcPath,".auxiliaries",fsep=fsep)
 dir.create(auxPATH,showWarnings=FALSE)
 
 # Check Platform and product
-PF <- substr(product,2,2)
-
-if 	  (PF %in% c("x","X")) { PF1  <- c("MOLT", "MOLA"); PF2  <- c("MOD", "MYD") 
-} else if (PF %in% c("y","Y")) { PF1  <- "MOLA"; PF2 <- "MYD"
-} else if (PF %in% c("o","O")) { PF1  <- "MOLT"; PF2 <- "MOD"
-} else if (PF %in% c("c","C")) { PF1  <- "MOTA"; PF2 <- "MCD"
-} else {stop("Check 'product', the Platform specific part seams wrong. Not one of 'MOD','MYD','MXD','MCD'.")
-}
-####
-PD <- substr(product,4,nchar(product)) #'09Q1',...
+product <- getPRODUCT(product=product)
 #####
-# collection
-collection <- sprintf("%03d",as.numeric(collection))
+# Check collection
+if (missing(collection)) {
+	collection <- getCOLLECTION(product=product)
+	} else {
+	collection <- sprintf("%03d",as.numeric(collection))
+	if (!getCOLLECTION(product=product,collection=collection)) {stop(paste("The collection you have requested may doesn't exist run: 'getCOLLECTION(LocalArcPath='",LocalArcPath,"',product='",product$request ,"',forceCheck=TRUE,newest=FALSE)' to update internal list and see available once!",sep=""))}
+	}
+
 
 # load aux
 if (file.exists(file.path(auxPATH,"ftpdir.txt",fsep=fsep))) {
@@ -47,11 +42,11 @@ if (file.exists(file.path(auxPATH,"ftpdir.txt",fsep=fsep))) {
 	
 data("MODIS_Products")
 
-for (i in 1:length(PF2)){
+for (i in 1:length(product$PF2)){
 	
-	productName <- paste(PF2[i],PD, ".",collection,sep="")
+	productName <- product$productName[i]
 
-	if (!paste(PF2[i],PD,sep="") %in% MODIS_Products[,1]) {stop(PF2[i],PD," is an unkown product\n",sep="")}
+	if (!paste(product$PF2[i],product$PD,sep="") %in% MODIS_Products[,1]) {stop(product$PF2[i],product$PD," is an unkown product\n",sep="")}
 	
 		if (productName %in% names(ftpdirs)) {
 			createNew <- FALSE
@@ -92,14 +87,14 @@ for (i in 1:length(PF2)){
 			createNew <- TRUE
 		}
 
-	if (getIT) {
 
-		ftp <- paste("ftp://e4ftl01u.ecs.nasa.gov/",PF1[i],"/", productName,"/",sep="")
+	if (getIT) { # the return is 'FtpDayDirs' of the requested product
+		ftp <- paste("ftp://e4ftl01u.ecs.nasa.gov/",product$PF1[i],"/", product$productName[i],".",collection,"/",sep="")
 		cat("Getting:", ftp,"\n")	
 		require(RCurl)
 		FtpDayDirs  <- getURL(ftp)
 	
-			if (wait > 0 & i != length(PF2)) {
+			if (wait > 0 & i != length(product$PF2)) {
 					require(audio)
 					wait(wait)
 					}
@@ -107,16 +102,15 @@ for (i in 1:length(PF2)){
 		FtpDayDirs  <- unlist(strsplit(FtpDayDirs[[1]], if(.Platform$OS.type=="unix"){"\n"}else{"\r\n"})) # Is this enought? Mac? Solaris?....
 		FtpDayDirs  <- FtpDayDirs[substr(FtpDayDirs, 1, 1)=='d'] 
 		FtpDayDirs  <- unlist(lapply(strsplit(FtpDayDirs, " "), function(x){x[length(x)]}))
-	} else {
-		FtpDayDirs <- ftpdirs[,ind]
 	}
 
-	if (createNew) {
+
+	if (createNew) { # put it to ftpdir.txt
 		FtpDayDirs <- matrix(FtpDayDirs)
 		mtr <- matrix(NA,ncol=ncol(ftpdirs)+1,nrow=max(length(FtpDayDirs),dim(ftpdirs)[1]))
 		colnames(mtr) <- if(ncol(ftpdirs)>0){c(colnames(ftpdirs),productName)} else {productName}	
 			
-			if (ncol(ftpdirs)!=0){ # relevant only for t
+			if (ncol(ftpdirs)!=0){ # relevant only for time
 				for(j in 1:ncol(ftpdirs)){
 					mtr[,j] <- replace(mtr[,j], 1:nrow(ftpdirs),ftpdirs[,j])
 				}
@@ -129,8 +123,7 @@ for (i in 1:length(PF2)){
 }
 
 write.table(ftpdirs,file.path(auxPATH,"ftpdir.txt",fsep=fsep))
-
-invisible(0) 
+invisible(ftpdirs) 
 }
 
 

@@ -29,7 +29,8 @@ LazyLoad: \tab yes\cr
 }
 }
 \author{
-Matteo Mattiuzzi; Institute of Surveying, Remote Sensing and Land Information (IVFL), BOKU Vienna 
+Matteo Mattiuzzi; Institute of Surveying, Remote Sensing and Land Information (IVFL), BOKU Vienna\cr 
+Anja Klisch; Institute of Surveying, Remote Sensing and Land Information (IVFL), BOKU Vienna 
 
 Maintainer: Matteo Mattiuzzi \email{matteo.mattiuzzi@boku.ac.at}
 }

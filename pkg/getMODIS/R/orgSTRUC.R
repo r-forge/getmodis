@@ -97,7 +97,7 @@ if (!file.exists(file.path(path,fname,fsep=fsep))) { # do nothing if file is alr
 			system(paste("mv ",x," ",path,sep=""))
 			moved <- 1
 		} else if (.Platform$OS.type == "windows" & move) {
-			shell(gsub(fsep,"\\\\",paste("move ",x," ", path,sep="")),intern=T)
+			shell(gsub(fsep,"\\\\",paste("move ",x," ", path,sep="")),intern=TRUE)
 			moved <- 1
 		} else {
 			file.copy(from=x,to=paste(path,"/",fname,sep=""),overwrite=FALSE)
