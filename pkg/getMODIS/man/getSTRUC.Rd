@@ -13,7 +13,7 @@ This function retrieves and updates the folder structure on the MODIS data pool 
 \usage{getSTRUC(LocalArcPath,product,collection,startdate,enddate,wait=1)}
 
 \arguments{
-  \item{LocalArcPath}{Character. Is needed because this funtion creates a hidden folder to store ftp directory inforamtion. If left emty standard path is used see \code{?getHDF}}
+  \item{LocalArcPath}{Character. Is needed because this funtion creates a hidden folder to store ftp directory information. If left empty standard path is used, see \code{?getHDF}.}
   
   \item{product}{Character. MODIS grid product to be downloaded. For 'MODIS TERRA Vegetation Indices at 250 m ground resolution' use: \code{MOD13Q1}. For vegetation indices from TERRA and AQUA use \code{MxD13Q1}. See \url{https://lpdaac.usgs.gov/lpdaac/products/modis_products_table} for more Products.}   
     
@@ -29,7 +29,7 @@ This function retrieves and updates the folder structure on the MODIS data pool 
 
 
 \value{
-  NONE, a file in an hidden folder \code{/MODIS_ARC/.auxiliaries/ftpdirs.txt}
+  NONE, a file in an hidden folder \code{/MODIS_ARC/.auxiliaries/ftpdir.txt}
 }
 
 \author{

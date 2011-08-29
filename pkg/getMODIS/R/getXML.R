@@ -26,7 +26,7 @@ if(HdfName[1]!="") { # ...[1] is because if there are more files this query thro
 		}
 	}
 	
-	 # TODO, chase where only a xml is downloaded witout having the hdf
+	 # TODO, chase where only a xml is downloaded without having the hdf
 	 
 avFiles <- unlist(avFiles)
 } else {
@@ -35,15 +35,15 @@ avFiles <- list.files(LocalArcPath,pattern=".hdf$",recursive=TRUE,full.names=TRU
 
 # tests if MODIS-grid file(s)
 doit <- sapply(avFiles,function(x) {
-	name <- strsplit(x,"/")[[1]] # separate name from path
-	name <- name[length(name)] # select filename
-	secName  <- strsplit(name,"\\.")[[1]] # decompose filename
+	fname <- strsplit(x,"/")[[1]] # separate name from path
+	fname <- fname[length(fname)] # select filename
+	secName  <- strsplit(fname,"\\.")[[1]] # decompose filename
 	PF <- substr(secName[1],1,3)
 	Tpat <- "h[0-3][0-9]v[0-1][0-9]" # to enhance
 
 	if (sum((grep(secName[3],pattern=Tpat)) + (substr(secName[2],1,1) == "A") + (PF %in% c("MOD","MYD")) + (length(secName)==6)) == 4){
 		res <- TRUE
-		} else {
+	} else {
 		res <- FALSE}
 
 	return(res)}
@@ -60,30 +60,31 @@ if(length(avFiles)==0) {return(cat("No MODIS-XML files to download.\n"))} else {
 success <- rep(NA,length(avFiles))
     for (u in seq(along=avFiles)){
 
-	if ( !file.exists(paste(avFiles[u],".xml",sep="")) || # if xml-file doesn't exists 
+	if ( !file.exists(paste(avFiles[u],".xml",sep="")) || # if xml-file doesn't exist 
 
 	 	if ( .Platform$OS.type == "unix") {as.numeric(system(paste("stat -c %s ",avFiles[u],".xml",sep=""), intern=TRUE)) < 2000}else{FALSE} # tested on Ubuntu 11.04
-# 		if ( .Platform$OS.type == "windows") {as.numeric(system(paste("for %I in (",avFiles[u],") do @echo %~zI",sep=""),intern=TRUE)) < 2000} # sould work with win2000 and later...but not tested! (http://stackoverflow.com/questions/483864/windows-command-for-file-size-only)
+	 	||
+ 		if ( .Platform$OS.type == "windows") {as.numeric(shell(paste("for %I in (",avFiles[u],") do @echo %~zI",sep=""),intern=TRUE)) < 2000}else{FALSE} # sould work with win2000 and later...but not tested! (http://stackoverflow.com/questions/483864/windows-command-for-file-size-only)
 # 		if (!.Platform$OS.type %in% c("unix","windows")) {FALSE} # if not unix or windows, skip this test...(for now)
-	# if file exists but smaller than 2000 B...  so probably brocken download
+	# if file exists but smaller than 2000 B...  so probably broken download
 	){
 
-	name <- strsplit(avFiles[u],"/")[[1]] # separate filename from path
-	name <- name[length(name)]
-	secName  <- strsplit(name,"\\.")[[1]] # decompose filename
+	fname <- strsplit(avFiles[u],"/")[[1]] # separate filename from path
+	fname <- fname[length(fname)]
+	secName  <- strsplit(fname,"\\.")[[1]] # decompose filename
 	PF <- substr(secName[1],1,3)
 
 	if(PF=="MOD"){PF <- "MOLT"} else {PF <- "MOLA"}
 
-	date <- substr(secName[2],2,8)
-	date <- format(as.Date(as.numeric(substr(date,5,7))-1,origin=paste(substr(date,1,4),"-01-01",sep="")),"%Y.%m.%d")
+	fdate <- substr(secName[2],2,8)
+	fdate <- format(as.Date(as.numeric(substr(fdate,5,7))-1,origin=paste(substr(fdate,1,4),"-01-01",sep="")),"%Y.%m.%d")
 
 	version <- secName[4]
 
 	require(RCurl) # is it good here?
 
 	success[u] <- download.file(
-			paste("ftp://e4ftl01u.ecs.nasa.gov/", PF,"/",secName[1],".",version,"/",date,"/",name,".xml",sep=""),
+			paste("ftp://e4ftl01u.ecs.nasa.gov/", PF,"/",secName[1],".",version,"/",fdate,"/",fname,".xml",sep=""),
 			destfile=paste(avFiles[u],".xml",sep=""),
 			mode='wb', method='wget', quiet=quiet, cacheOK=FALSE)
 

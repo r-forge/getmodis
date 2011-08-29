@@ -4,9 +4,9 @@
 
 \alias{orgSTRUC}
 
-\title{Change structure of local Archive}
+\title{Organise structure of the local MODIS data archive}
 
-\description{This function changes the storage structure (see details). Depending on the amount of files stored and how files are accessd the folder structure can be changed. !Use this function with care! }
+\description{This function changes the storage structure (see details). Depending on the amount of files stored and how files are accessed, the folder structure can be changed. !Use this function with care! }
 
 \usage{orgSTRUC(LocalArcPath,HdfName,to,move=TRUE)}
 
@@ -17,7 +17,7 @@
 
  \item{to}{Integer between \code{1} and \code{3}}
 
- \item{move}{Logical. Default is \code{TRUE}, this means that files are moved and multiple files are deleted. It \code{FALSE},files are just copied and remain in origin folder!}
+ \item{move}{Logical. Default is \code{TRUE}, this means that files are moved and multiple files are deleted. If \code{FALSE}, files are just copied and remain in origin folder!}
 }
 
 \details{

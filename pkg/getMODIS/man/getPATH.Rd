@@ -7,7 +7,7 @@
 \title{get path to MRT}
 
 \description{
-  If PATH variable to MRT is not set, this function search for it.}
+  If PATH variable to MRT is not set, this function searchs for it.}
 
 \usage{getPATH(deep=FALSE,quiet=FALSE)}
 

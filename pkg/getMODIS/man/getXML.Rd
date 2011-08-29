@@ -13,7 +13,7 @@
   information about each MODIS-hdf file. Within that package, the
   xml-files are used to check the size of the downloaded hdf files, and
   correcting the so often broken downloads from the MODIS online
-  archive. getXML checks localy for the presense of spezified xml files
+  archive. getXML checks locally for the presence of spezified xml files
   and if not available it retrieves them from the MODIS ftp server.
 }
 
