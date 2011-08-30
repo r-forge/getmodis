@@ -42,8 +42,8 @@ This function retrieves and updates the folder structure on the MODIS data pool 
 
 \examples{
 # update or get the structure for MOD13Q1 and MYD13Q1 collection "005"
-# getSTRUC(product=MxD13Q1",collection=5)
+# getSTRUC(product="MxD13Q1",collection=5)
 
 # update or get the structure for MOD09GQ within a limited period
-# getSTRUC(product=MxD13Q1",collection=5, startdate="2003.05.03",enddate="2008.07.23")
+# getSTRUC(product="MxD13Q1",collection=5, startdate="2003.05.03",enddate="2008.07.23")
 }

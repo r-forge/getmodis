@@ -45,12 +45,13 @@ data("MODIS_Products")
 for (i in 1:length(product$PF2)){
 	
 	productName <- product$productName[i]
+	productNameFull <- paste(product$productName[i],".",collection,sep="")
 
 	if (!paste(product$PF2[i],product$PD,sep="") %in% MODIS_Products[,1]) {stop(product$PF2[i],product$PD," is an unkown product\n",sep="")}
 	
-		if (productName %in% names(ftpdirs)) {
+		if (productNameFull %in% names(ftpdirs)) {
 			createNew <- FALSE
-			ind <- which(names(ftpdirs)==productName)
+			ind <- which(names(ftpdirs)==productNameFull)
 
 			if (length(ftpdirs[,ind]) == 0 ) { # ...relevant for the first time only
 				getIT <- TRUE
@@ -89,7 +90,7 @@ for (i in 1:length(product$PF2)){
 
 
 	if (getIT) { # the return is 'FtpDayDirs' of the requested product
-		ftp <- paste("ftp://e4ftl01u.ecs.nasa.gov/",product$PF1[i],"/", product$productName[i],".",collection,"/",sep="")
+		ftp <- paste("ftp://e4ftl01u.ecs.nasa.gov/",product$PF1[i],"/", productNameFull,"/",sep="")
 		cat("Getting:", ftp,"\n")	
 		require(RCurl)
 		FtpDayDirs  <- getURL(ftp)
@@ -108,7 +109,7 @@ for (i in 1:length(product$PF2)){
 	if (createNew) { # put it to ftpdir.txt
 		FtpDayDirs <- matrix(FtpDayDirs)
 		mtr <- matrix(NA,ncol=ncol(ftpdirs)+1,nrow=max(length(FtpDayDirs),dim(ftpdirs)[1]))
-		colnames(mtr) <- if(ncol(ftpdirs)>0){c(colnames(ftpdirs),productName)} else {productName}	
+		colnames(mtr) <- if(ncol(ftpdirs)>0){c(colnames(ftpdirs),productNameFull)} else {productNameFull}	
 			
 			if (ncol(ftpdirs)!=0){ # relevant only for time
 				for(j in 1:ncol(ftpdirs)){
