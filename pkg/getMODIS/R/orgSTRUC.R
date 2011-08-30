@@ -12,14 +12,12 @@ fsep <- .Platform$file.sep
 if (missing(LocalArcPath)) {
 	LocalArcPath <- "~/"
 	LocalArcPath <- normalizePath(path.expand(LocalArcPath), winslash = fsep)
-	LocalArcPath <- paste(strsplit(LocalArcPath,fsep)[[1]],collapse=fsep)# removes "/" or "\" on last position (if present)
 	LocalArcPath <- file.path(LocalArcPath,"MODIS_ARC",fsep=fsep)
 	cat(paste("No archive path set, using/creating standard archive in: ",LocalArcPath,"\n",sep=""))
 	flush.console()
 }
 
-#LocalArcPath <- paste(strsplit(LocalArcPath,fsep)[[1]],collapse=fsep)# removes "/" or "//" on last position (if present)
-
+LocalArcPath <- paste(strsplit(LocalArcPath,fsep)[[1]],collapse=fsep)# removes "/" or "\" on last position (if present)
 dir.create(LocalArcPath,showWarnings=FALSE)
 # test local LocalArcPath
 try(testDir <- list.dirs(LocalArcPath),silent=TRUE)

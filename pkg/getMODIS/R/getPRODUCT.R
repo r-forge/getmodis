@@ -1,8 +1,6 @@
 # Author: Matteo Mattiuzzi, matteo.mattiuzzi@boku.ac.at
 # Date : August 2011
-# Version 0.1
 # Licence GPL v3
-
 
 getPRODUCT <- function(product,quiet=TRUE){
 
@@ -25,7 +23,6 @@ if        (PF %in% c("x","X")) { PF1  <- c("MOLT", "MOLA"); PF2  <- c("MOD", "MY
 # Check product
 PD <- substr(product,4,nchar(product)) #'09Q1',...
 #####
-
 
 data("MODIS_Products")
 

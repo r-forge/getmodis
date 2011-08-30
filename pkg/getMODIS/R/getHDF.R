@@ -3,7 +3,7 @@
 # Licence GPL v3
   
 
-getHDF <- function(LocalArcPath,HdfName,product,startdate,enddate,tileH,tileV,extent,collection,quiet=FALSE,wait=1,checkXML=FALSE) {
+getHDF <- function(LocalArcPath,HdfName,product,startdate,enddate,tileH,tileV,extent,collection,quiet=FALSE,wait=1,checkXML=FALSE,log=TRUE) {
 
 if (wait > 0){require(audio)} # waiting seams to decrease the chance of ftp rejection!
 
@@ -12,12 +12,14 @@ fsep <- .Platform$file.sep
 if (missing(LocalArcPath)) {
 	LocalArcPath <- "~/"
 	LocalArcPath <- normalizePath(path.expand(LocalArcPath), winslash = fsep)
-	LocalArcPath <- paste(strsplit(LocalArcPath,fsep)[[1]],collapse=fsep)# removes "/" or "\" on last position (if present)
 	LocalArcPath <- file.path(LocalArcPath,"MODIS_ARC",fsep=fsep)
+	if(!quiet){
 	cat(paste("No archive path set, using/creating standard archive in: ",LocalArcPath,"\n",sep=""))
 	flush.console()
+	}
 }
 
+LocalArcPath <- paste(strsplit(LocalArcPath,fsep)[[1]],collapse=fsep)# removes "/" or "\" on last position (if present)
 dir.create(LocalArcPath,showWarnings=FALSE)
 # test local LocalArcPath
 try(testDir <- list.dirs(LocalArcPath),silent=TRUE)
@@ -29,40 +31,43 @@ if(!exists("testDir")) {stop("'LocalArcPath' not set properly!")}
 if (!missing(HdfName)){ 
 
 	HdfName <- unlist(HdfName)
+	dates <- list()
 	for (i in seq(along=HdfName)){
 	
 	secName <- strsplit(HdfName[i],"\\.")[[1]]
 	
 		if (secName[length(secName)]!= "hdf"){stop(secName,"is not a good hdf HdfName")}
 					
-	PF <- substr(secName[1],1,3)
-		
-		if (!PF %in% c("MOD","MYD")) {stop(PF," not from TERRA or AQUA")}
-
-	if(PF == "MOD"){PF1 <- "MOLT"} else {PF1 <- "MOLA"}
+	product <- getPRODUCT(product=secName[1])
+  
+	collection <- sprintf("%03d",as.numeric(secName[4]))
+		if (!getCOLLECTION(product=product,collection=collection)) {stop(paste("The collection you have requested may doesn't exist run: 'getCOLLECTION(LocalArcPath='",LocalArcPath,"',product='",product$request ,"',forceCheck=TRUE,newest=FALSE)' to update internal list and see available once!",sep=""))}
 
 	fdate <- substr(secName[2],2,8)
 	fdate <- format(as.Date(as.numeric(substr(fdate,5,7))-1,origin=paste(substr(fdate,1,4),"-01-01",sep="")),"%Y.%m.%d")
-	collection <- secName[4]
-
-	arcPath <- paste(secName[1],".",collection,fsep,fdate,fsep,sep="")
+	
+	arcPath <- paste(product$productName,".",collection,fsep,fdate,fsep,sep="")
 	dir.create(paste(LocalArcPath,fsep,arcPath,sep=""),recursive=TRUE,showWarnings=FALSE) # this always generates the same structure as the original ftp (this makes sense if the local LocalArcPath becomes big!)
 	
 		if (!file.exists(paste(LocalArcPath,fsep,arcPath,HdfName[i],sep=""))) {
-		    require(RCurl)
-				ftpPath <- paste("ftp://e4ftl01u.ecs.nasa.gov/",PF1,"/", secName[1],".",collection,"/",fdate,"/",HdfName[i],sep="")
+		  require(RCurl)
+			ftpPath <- paste("ftp://e4ftl01u.ecs.nasa.gov/",product$PF1,"/", product$productName,".",collection,"/",fdate,"/",HdfName[i],sep="")
 	download.file(
-				ftpPath,
-				destfile=paste(LocalArcPath,fsep,arcPath,HdfName[i],sep=""),
-				mode='wb', method='wget', quiet=quiet, cacheOK=FALSE)
+			ftpPath,
+			destfile=paste(LocalArcPath,fsep,arcPath,HdfName[i],sep=""),
+			mode='wb', method='wget', quiet=quiet, cacheOK=FALSE)
 			
-			if (wait!=0) {wait(wait)}
-
+			if (wait!=0) {
+				wait(wait)
+				}
 		}
-		if(checkXML){getXML(HdfName = HdfName[i])}
-	}
-cat("downloaded: ",HdfName[i],"\n")
+		if(checkXML){
+			getXML(HdfName = HdfName[i])
+			}
 
+dates[[i]] <- paste(LocalArcPath,fsep,arcPath,HdfName[i],sep="")
+	}
+invisible(unlist(Dates))
 
 } else { # if HdfName is'nt provided:
 
@@ -72,12 +77,14 @@ if (missing(extent) & (missing(tileH) | missing(tileV))){stop("Please provide ei
 if (missing(product))   {stop("Please provide the MODIS-'product'")}
 #######
 # check product
-
 product <- getPRODUCT(product=product)
 
 # check collection
 if (missing(collection)) {
 	collection <- getCOLLECTION(product=product)
+		if (!quiet){
+	cat("No Collection spezified used the newest for",product$productName,":", collection,"\n")
+		}
 	} else {
 	collection <- sprintf("%03d",as.numeric(collection))
 	if (!getCOLLECTION(product=product,collection=collection)) {stop(paste("The collection you have requested may doesn't exist run: 'getCOLLECTION(LocalArcPath='",LocalArcPath,"',product='",product$request ,"',forceCheck=TRUE,newest=FALSE)' to update internal list and see available once!",sep=""))}
@@ -191,18 +198,32 @@ if (sum(mtr)!=0) { # if one or more of the tiles in date is missing, its necessa
 			}
 		}
 	} else {
-	dates[[z]][i,(j+1):ncol(dates[[z]])] <- "No files for that date on FTP"} # on ftp is possible to find empty folders!
+	dates[[z]][i,(j+1):ncol(dates[[z]])] <- "No files for that date on FTP"
+	} # on ftp is possible to find empty folders!
 }
 
-dir.create(paste(LocalArcPath,fsep,"LOGS",fsep,sep=""),showWarnings=FALSE)	
-write.csv(dates[[z]],file=paste(LocalArcPath,fsep,"LOGS",fsep,product$PF2[z],product$PD,"_",collection,"_CHECK.csv",sep=""))
-
-if(checkXML){xml <-  getXML(HdfName = list(paste(arcPath,dates[[z]][i,-1],sep="")),wait=wait)} # list() should not be needed
+if (log) {
+	dir.create(paste(LocalArcPath,fsep,"LOGS",fsep,sep=""),showWarnings=FALSE)	
+	write.csv(dates[[z]],file=paste(LocalArcPath,fsep,"LOGS",fsep,product$PF2[z],product$PD,"_",collection,"_CHECK.csv",sep=""))
+	}
+	
+if(checkXML){
+	xml <-  getXML(HdfName = list(paste(arcPath,dates[[z]][i,-1],sep="")),wait=wait)
+	} # list() should not be needed
 
 } # end dates i 
-}else{ cat(paste("No files on ftp in date range for: ",product$PF2[z],product$PD,".",collection,"\n\n",sep=""))  }
+}else{
+		if (!quiet){
+	cat(paste("No files on ftp in date range for: ",product$PF2[z],product$PD,".",collection,"\n\n",sep=""))
+		}
+	}
 } # if no files are avalable for product in date AND end platform z
-} # end if not HdfName 
+} # end if not HdfName
+if (length(dim(dates))==2) {
+			invisible(paste(arcPath,dates[,-1],sep=""))
+		} else {
+			invisible(paste(arcPath,unlist(dates)[-1],sep=""))
+		}
 } ## END: FTP vs ARC check and download 
 
 

@@ -1,5 +1,5 @@
 Job         <- "Marchfeld_testJob"
-outDir      <- "./MRTresults" # will become: "./MRTresults/Job"  
+outDir      <- "~/MRTresults" # will become: "./MRTresults/Job"  
 product     <- "MxD13Q1"  ## For available products see: data("MODIS_Products") or https://lpdaac.usgs.gov/lpdaac/products/modis_products_table !!!
 #collection  <- "005"	## Modis Processing version number probable you are happy with "005"
 startdate   <- "2003.05.01"  ## start-date YYYY.MM.DD, limit periode to be downloaded/processed

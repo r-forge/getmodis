@@ -3,14 +3,27 @@
 # Version 0.2
 # Licence GPL v3
 
-getXML <- function(LocalArcPath="",HdfName="", wait=1,quiet=FALSE){
+getXML <- function(LocalArcPath,HdfName="", wait=1,quiet=FALSE){
 
-###################
-if (LocalArcPath!=""){
-LocalArcPath <- path.expand(LocalArcPath)
-} else {
-LocalArcPath <- "."
+fsep <- .Platform$file.sep
+
+if (missing(LocalArcPath)) {
+	LocalArcPath <- "~/"
+	LocalArcPath <- normalizePath(path.expand(LocalArcPath), winslash = fsep)
+	LocalArcPath <- file.path(LocalArcPath,"MODIS_ARC",fsep=fsep)
+	if(!quiet){
+	cat(paste("No archive path set, using/creating standard archive in: ",LocalArcPath,"\n",sep=""))
+	flush.console()
+	}
 }
+
+LocalArcPath <- paste(strsplit(LocalArcPath,fsep)[[1]],collapse=fsep)# removes "/" or "\" on last position (if present)
+dir.create(LocalArcPath,showWarnings=FALSE)
+# test local LocalArcPath
+try(testDir <- list.dirs(LocalArcPath),silent=TRUE)
+if(!exists("testDir")) {stop("'LocalArcPath' not set properly!")} 
+#################
+
 
 if(HdfName[1]!="") { # ...[1] is because if there are more files this query throws a warning... 
 	

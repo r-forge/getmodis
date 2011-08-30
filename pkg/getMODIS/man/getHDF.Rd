@@ -3,7 +3,7 @@
 \docType{methods}
 
 \alias{getHDF}
-\alias{getHDF, LocalArcPath, HdfName, product, startdate, enddate, tileH, tileV, extent, collection, quiet, wait, checkXML}
+\alias{getHDF, LocalArcPath, HdfName, product, startdate, enddate, tileH, tileV, extent, collection, quiet, wait, checkXML,log}
 
 \title{Create or update a local, user-defined subset of the global online
   MODIS grid data pool.}
@@ -17,7 +17,7 @@
   update of local MODIS data archive.
 }
 
-\usage{getHDF(LocalArcPath, HdfName, product, startdate, enddate, tileH, tileV, extent, collection, quiet=FALSE, wait=1, checkXML=FALSE)}
+\usage{getHDF(LocalArcPath, HdfName, product, startdate, enddate, tileH, tileV, extent, collection, quiet=FALSE, wait=1, checkXML=FALSE,log=TRUE)}
 
 \arguments{
 
@@ -44,6 +44,8 @@
   \item{wait}{Numeric. Default \code{1}. Inserts a break (in seconds) after every internal \code{download.file()} or \code{getURL()} call. It reduces the chance of FTP connection error that often occurs after many requests. Requires the 'audio' package. (Hopefully a temporary solution!)}
 
   \item{quiet}{Logical. Refers to all internal \code{download.file()} actions. Default \code{FALSE}, if \code{TRUE} the \code{getHDF} becomes really boring.}
+  
+    \item{log}{Logical. Default \code{TRUE}, a log file is generated in \code{LocalArcPath}}
 }
 
 \value{
