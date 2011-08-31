@@ -10,7 +10,7 @@ if (!file.exists(MRTpath)) {stop("'MRTpath' is wrong or MRT not installed? Provi
 
 if (!file.exists(HdfName)) {
 	cat("Hm, I have to search for the file!\n")
-	HdfName <- list.files(pattern=paste(HdfName,"$",sep=""),recursive=TRUE)
+	HdfName <- normalizePath(list.files(path="~/",pattern=paste(HdfName,"$",sep=""),recursive=TRUE,full.names = TRUE),winslash=fsep)
 	}
 	
 	HdfName <- HdfName[1]
@@ -19,7 +19,7 @@ if (.Platform$OS=="unix"){
 	sdsRaw <- system(paste(file.path(MRTpath,"sdslist",fsep=fsep),HdfName,sep=" "),intern=TRUE)
 	
 }else if (.Platform$OS=="windows"){
-	sdsRaw <- call(paste(file.path(MRTpath,"sdslist",fsep=fsep),HdfName,sep=" "),intern=TRUE)
+	sdsRaw <- shell(gsub(fsep,"\\\\",paste(file.path(MRTpath,"sdslist",fsep=fsep),HdfName,sep=" ")),intern=TRUE)
 
 } else {
 	stop(cat("What OS have you? Please tell me so I can fix this.\n")) 
@@ -35,5 +35,3 @@ sds <- unlist(lapply(sds,function(x){paste(strsplit(x,", ")[[1]][1:2],collapse="
 
 return(sds)
 }
-
-
