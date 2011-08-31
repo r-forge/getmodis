@@ -1,4 +1,4 @@
-getSDS <- function(HdfName,MRTpath="check") {
+getSDS <- function(HdfName,SDSstring,MRTpath="check") {
 ######
 fsep <- .Platform$file.sep
 
@@ -33,5 +33,13 @@ sds <- sdsRaw[unlist(sds)]
 sds <- unlist(lapply(sds,function(x){strsplit(x,": ")[[1]][2]}))
 sds <- unlist(lapply(sds,function(x){paste(strsplit(x,", ")[[1]][1:2],collapse=": ")}))
 
-return(sds)
+if (!missing(SDSstring)){
+	if (inherits(SDSstring,"list")) {SDSstring <- paste(SDSstring$SDSstring,collapse="")}# getSDS class would be better!!!
+	msk <- rep(FALSE,nchar(SDSstring))
+	for (o in 1:nchar(SDSstring)){
+	msk[o] <- substr(SDSstring,o,o)==1
+	}
+return(list(SDSnames = sds[msk],SDSstring = paste(as.numeric(msk),collapse=" ")))
+	} else {
+return(sds)}
 }
