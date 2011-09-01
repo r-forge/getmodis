@@ -37,7 +37,7 @@ if (!missing(SDSstring)){
 	if (inherits(SDSstring,"list")) {
 		SDSstring <- paste(SDSstring$SDSstring,collapse="")
 		}# getSDS class would be better!!!
-	if (nchar(SDSstring)!= length(sds)) {
+	if (nchar(gsub(" ","",SDSstring))!= length(sds)) {
 		stop("The file has ",length(sds)," layers (SDS), your SDSstring must have the same length!")
 		}
 				

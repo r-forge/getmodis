@@ -39,6 +39,7 @@ if (!exists("product")) {stop("Provide a MODIS product to be processed")}
 if (!exists("outDir"))  {
 	outDir <- "~/"
 	outDir <- normalizePath(path.expand(outDir), winslash = fsep)
+	outDir <- paste(strsplit(outDir,fsep)[[1]],collapse=fsep) # removes "/" or "\" on last position (if present)
 	outDir <- file.path(outDir,"MRTresults",job,fsep=fsep)
 	}
 dir.create(outDir,recursive=TRUE,showWarnings=FALSE)
@@ -139,8 +140,8 @@ close(filename)
 # run mosaic
 if (.Platform$OS=="unix") {
 		system(paste(MRTpath,fsep,"mrtmosaic -i ",paraname," -o ",outDir,fsep,TmpMosNam," -s '",SDSstring$SDSstring,"'" ,sep=""))
-	} else { # TODO CHECK on Win!!
-	  call(paste(MRTpath,fsep,"mrtmosaic -i ",paraname," -o ",outDir,fsep,TmpMosNam," -s '",SDSstring,"'" ,sep=""))
+	} else {
+	  shell(paste(MRTpath,fsep,"mrtmosaic -i ",paraname," -o ",outDir,fsep,TmpMosNam," -s \"",SDSstring$SDSstring,"\"" ,sep=""))
 	}
 unlink(paraname)
 
@@ -167,8 +168,8 @@ close(filename)
 
 if (.Platform$OS=="unix") {
 		system(paste(MRTpath,fsep,"resample -p ",paraname,sep=""))
-	} else { # TODO CHECK on Win!!
-	  call(paste(MRTpath,fsep,"resample -p ",paraname,sep=""))
+	} else {
+	  shell(paste(MRTpath,fsep,"resample -p ",paraname,sep=""))
 	}
 unlink(paraname)
 unlink(paste(outDir,fsep,TmpMosNam,sep=""))
