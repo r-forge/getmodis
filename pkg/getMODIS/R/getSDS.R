@@ -36,16 +36,16 @@ sds <- unlist(lapply(sds,function(x){paste(strsplit(x,", ")[[1]][1:2],collapse="
 if (!missing(SDSstring)){
 	if (inherits(SDSstring,"list")) {
 		SDSstring <- paste(SDSstring$SDSstring,collapse="")
-		}# getSDS class would be better!!!
+		}
 	
-	stringlength <- nchar(gsub(pattern=" ",replacement="",x=SDSstring))
-	
-	if (stringlength!= length(sds)) {
-		stop("The file has ",length(sds)," layers (SDS), your SDSstring has length ",nchar(gsub(" ","",SDSstring)),"!")
+SDSstring <- gsub(pattern=" ",replacement="",x=SDSstring) # collapse the spaces
+
+	if (nchar(SDSstring)!= length(sds)) {
+		stop("The file has ",length(sds)," layers (SDS), your SDSstring has length ",nchar(SDSstring),"!")
 		}
 				
-	msk <- rep(FALSE,stringlength)
-	for (o in 1:stringlength){
+	msk <- rep(FALSE,nchar(SDSstring))
+	for (o in 1:nchar(SDSstring)){
 	msk[o] <- substr(SDSstring,o,o)==1
 	}
 return(list(SDSnames = sds[msk],SDSstring = paste(as.numeric(msk),collapse=" ")))

@@ -19,7 +19,7 @@ Installing additional software it is possible to further process downloaded data
 \tabular{ll}{
 Package: \tab getMODIS\cr
 Type: \tab Package\cr
-Version: \tab 0.1-10\cr
+Version: \tab 0.2-2\cr
 Date: \tab 2011-08-10\cr
 License: \tab GPL (>=3)\cr
 LazyLoad: \tab yes\cr
