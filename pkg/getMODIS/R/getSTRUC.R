@@ -91,7 +91,7 @@ for (i in 1:length(product$PF2)){
 
 	if (getIT) { # the return is 'FtpDayDirs' of the requested product
 		ftp <- paste("ftp://e4ftl01u.ecs.nasa.gov/",product$PF1[i],"/", productNameFull,"/",sep="")
-		cat("Getting:", ftp,"\n")	
+		cat("Getting structure for:", ftp,"\n")	
 		require(RCurl)
 		FtpDayDirs  <- getURL(ftp)
 	
