@@ -37,12 +37,15 @@ if (!missing(SDSstring)){
 	if (inherits(SDSstring,"list")) {
 		SDSstring <- paste(SDSstring$SDSstring,collapse="")
 		}# getSDS class would be better!!!
-	if (nchar(gsub(" ","",SDSstring))!= length(sds)) {
-		stop("The file has ",length(sds)," layers (SDS), your SDSstring must have the same length!")
+	
+	stringlength <- nchar(gsub(pattern=" ",replacement="",x=SDSstring))
+	
+	if (stringlength!= length(sds)) {
+		stop("The file has ",length(sds)," layers (SDS), your SDSstring has length ",nchar(gsub(" ","",SDSstring)),"!")
 		}
 				
-	msk <- rep(FALSE,nchar(SDSstring))
-	for (o in 1:nchar(SDSstring)){
+	msk <- rep(FALSE,stringlength)
+	for (o in 1:stringlength){
 	msk[o] <- substr(SDSstring,o,o)==1
 	}
 return(list(SDSnames = sds[msk],SDSstring = paste(as.numeric(msk),collapse=" ")))
