@@ -1,7 +1,7 @@
-job <- "Austria_testJob"
+job <- "Austria_LST"
 product <- "MYD11A1"  ## For available products run: " data("MODIS_Products");MODIS_Products " or see: https://lpdaac.usgs.gov/lpdaac/products/modis_products_table !!!
-startdate <- "2008.01.05"  ## start-date YYYY.MM.DD, limit periode to be downloaded/processed
-enddate   <- "2008.01.10"   ## end-date YYYY.MM.DD,limit periode to be downloaded/processed
+startdate <- "2008.01.01"  ## start-date YYYY.MM.DD, limit periode to be downloaded/processed
+enddate   <- "2008.01.02"   ## end-date YYYY.MM.DD,limit periode to be downloaded/processed
 extent    <-  list(lat_min=46.12,lat_max=49.3,lon_min=9.2,lon_max=17.47) # see: ?getTILE for possibilities
 # outDir <- "./MRTresult"
 
@@ -13,7 +13,7 @@ outProj   <- "GEOGRAPHIC" # See: MRT doc for available (if missing "GEOGRAPHIC" 
 # ProjParam <- TODO
 
 # extract SDS
-SDSstring <- "111000000000" # run: getSDS(HdfName="name.hdf") to create the string 
+SDSstring <- "110011000000" # run: getSDS(HdfName="name.hdf") to create the string 
 
 # encode bits TODO
 
