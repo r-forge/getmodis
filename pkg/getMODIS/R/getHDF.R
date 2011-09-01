@@ -118,19 +118,20 @@ for(z in 1:length(product$PF1)){ # Platforms MOD/MYD
 
 	productName <- product$productName[z]
 	
-	ftp <- paste("ftp://e4ftl01u.ecs.nasa.gov/", product$PF1[z],"/", productName,".",collection,"/",sep="")
+	ftp <- paste("ftp://e4ftl01u.ecs.nasa.gov/", product$PF1[z],"/", product$productName[z],".",collection,"/",sep="")
 
-	invisible(getSTRUC(LocalArcPath=LocalArcPath,product=productName,collection=collection,startdate=startdate,enddate=enddate,wait=0))
+	ftpdirs <- getSTRUC(LocalArcPath=LocalArcPath,product=product$productName[z],collection=collection,startdate=startdate,enddate=enddate,wait=0)
 		if (wait > 0){wait(as.numeric(wait))}
-
-	FtpDayDirs <- read.table(file.path(auxPATH, "ftpdir.txt", fsep = fsep), stringsAsFactors = FALSE)
-	FtpDayDirs <- FtpDayDirs[,which(colnames(FtpDayDirs)==paste(productName,".",collection,sep=""))] 
-	FtpDayDirs <- FtpDayDirs[!is.na(FtpDayDirs)]
+		
+	ftpdirs <- ftpdirs[,which(colnames(ftpdirs)==paste(product$productName[z],".",collection,sep=""))] 
+	ftpdirs <- ftpdirs[!is.na(ftpdirs)]
 	
-	sel <- as.Date(FtpDayDirs,format="%Y.%m.%d") # convert to date
+	sel <- as.Date(ftpdirs,format="%Y.%m.%d") # convert to date
 	us  <- sel >= begin & sel <= end
+
 	if (sum(us,na.rm=TRUE)>0){ 
-	dates[[z]] <- FtpDayDirs[us]
+
+	dates[[z]] <- ftpdirs[us]
 
 	dates[[z]] <- cbind(dates[[z]],matrix(rep(NA, length(dates[[z]])*ntiles),ncol=ntiles,nrow=length(dates[[z]])))
 	colnames(dates[[z]]) <- c("date",tileID)

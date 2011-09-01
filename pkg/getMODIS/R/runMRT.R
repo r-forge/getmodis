@@ -3,12 +3,16 @@
 # Licence GPL v3
 
 
-
-runMRT <- function(LocalArcPath,ParaSource, MRTpath = "check") {
-
-if (missing(ParaSource)) {stop("Provide a Parameter file see: data('ParaExample'))")}
+runMRT <- function(LocalArcPath,ParaSource, MRTpath = "check",quiet=FALSE) {
 
 fsep <- .Platform$file.sep
+
+if (missing(ParaSource)) {
+	ParaEx <- file.path(find.package('getMODIS'),'external','ParaExample.R')
+	stop(paste("Provide a valid 'ParaSource' file, see or use: '",ParaEx,"'",sep=""))
+	} else {
+	source(ParaSource)
+	}
 
 if (missing(LocalArcPath)) {
 	LocalArcPath <- "~/"
@@ -27,7 +31,7 @@ if(!exists("testDir")) {stop("'LocalArcPath' not set properly!")}
 #################
 
 if (!exists("extent"))  {stop("Provide a valid 'extent'.")}
-if (!exists("Job"))     {stop("Provide a valid 'Job'-name")}
+if (!exists("job"))     {stop("Provide a valid 'job'-name")}
 if (!exists("startdate")) {stop("Provide a 'startdate'")}
 if (!exists("enddate")) {stop("Provide a 'enddate'")}
 if (!exists("product")) {stop("Provide a MODIS product to be processed")}
@@ -35,7 +39,7 @@ if (!exists("product")) {stop("Provide a MODIS product to be processed")}
 if (!exists("outDir"))  {
 	outDir <- "~/"
 	outDir <- normalizePath(path.expand(outDir), winslash = fsep)
-	outDir <- file.path(outDir,"MRTresults",Job,fsep=fsep)
+	outDir <- file.path(outDir,"MRTresults",job,fsep=fsep)
 	}
 dir.create(outDir,recursive=TRUE,showWarnings=FALSE)
 # test local LocalArcPath
@@ -43,22 +47,31 @@ try(testDir <- list.dirs(outDir),silent=TRUE)
 if(!exists("testDir")) {stop("'outDir' not set properly!")} 
 ##############
 
-if (!exists("pixelsize") | pixelsize=="") {
-	cat("No output 'pixelsize' spezified, input size used!\n")
+if (!exists("pixelsize")) {
+	cat("No output 'pixelsize' specified, input size used!\n")
+	pixelsize <- "asIn"
+	} else if (pixelsize==""){
+	cat("No output 'pixelsize' specified, input size used!\n")
 	pixelsize <- "asIn"
 	} else {
-	cat("resampling to pixelsize:", pixelsize,"\n")
+	cat("Resampling to pixelsize:", pixelsize,"\n")
 	}
 
-if (!exists("resample") | resample=="" ) {
-	cat("No resampling method spezified, using nearest neighbor!\n")
+if (!exists("resample")) {
+	cat("No resampling method specified, using nearest neighbor!\n")
+	resample <- "NN"
+	} else if (resample=="") {
+	cat("No resampling method specified, using nearest neighbor!\n")
 	resample <- "NN"
 	} else {
 	cat("Resampling method:", resample,"\n")
 	}
 
-if (!exists("outProj") | outProj==""  ) {
-	cat("No output projection spezified, using WGS84!\n")
+if (!exists("outProj")) {
+	cat("No output projection specified, using WGS84!\n")
+	outProj <- "GEOGRAPHIC"
+	} else if ( outProj=="" ){
+	cat("No output projection specified, using WGS84!\n")
 	outProj <- "GEOGRAPHIC"
 	} else {
 	cat("Output projection:", outProj,"\n")
@@ -73,7 +86,7 @@ if (!file.exists(MRTpath)) {stop("'MRTpath' is wrong. Provide a good path, leave
 product <- getPRODUCT(product=product)
 
 # check collection
-if (!exists(collection)) {
+if (!exists("collection")) {
 	collection <- getCOLLECTION(product=product)
 	} else {
 	collection <- sprintf("%03d",as.numeric(collection))
@@ -84,7 +97,8 @@ if (!exists(collection)) {
 # getSTRUC garants that all needed dir structure information is made avalable offline
 ftpdirs <- getSTRUC(product=product$request,collection=collection,startdate=startdate,enddate=enddate)
 
-for(i in 1:length(product$PF1)) { # along platform
+######################## along platform
+for(i in 1:length(product$PF1)) { 
 
 avDates <- ftpdirs[,colnames(ftpdirs)==paste(product$productName[i],".",collection,sep="")]
 avDates <- avDates[!is.na(avDates)]
@@ -100,18 +114,19 @@ end <- as.Date(enddate,format="%Y.%m.%d")
 
 avDates <- avDates[us]
 
-for (l in 1:length(avDates)){ # along start-end-date
+######################### along start-end-date
+for (l in 1:length(avDates)){ 
 
-files <- getHDF(LocalArcPath=LocalArcPath,product=product$productName[i],collection=collection,startdate=avDates[i],enddate=avDates[i],extent=extent,log=FALSE)
+files <- getHDF(LocalArcPath=LocalArcPath,product=product$productName[i],collection=collection,startdate=avDates[l],enddate=avDates[l],extent=extent,log=FALSE)
 
-if (file.exists(files)){
+if (sum(file.exists(files))==length(files)){
 
-if (!exists("SDSstring")) {stop(paste("No 'SDSstring' is specified, run: 'getSDS(HdfName='",files[1],"')' to see which are available, and generate the sting",sep=""))
+if (!exists("SDSstring")) {stop(paste("No 'SDSstring' is specified, run: 'getSDS(HdfName='",files[1],"')' to see which SDS are available, and generate the SDSsting",sep=""))
 } else {
 SDSstring <- getSDS(HdfName=files[1],SDSstring=SDSstring)
 } 
 
-if (!quiet & i == 1) {cat("Extracing SDS:",SDSstring$SDSnames,sep="\n")}
+if (!quiet && i == 1 && l == 1) {cat("\nExtracing SDS:",SDSstring$SDSnames,sep="\n ")}
 
 
 TmpMosNam <- paste("TmpMosaic",round(runif(1,1,10000)),".hdf",sep="") # to make sure access priority
@@ -134,7 +149,7 @@ wait(1) # without wait the skript can break here. "wait" is a try but it seams t
 
 basenam <- strsplit(files[1],fsep)[[1]]
 basenam <- basenam[length(basenam)]
-basenam <- paste(paste(strsplit(basenam,"\\.")[[1]][c(1,2,4)],collapse="."),Job,sep=".")
+basenam <- paste(paste(strsplit(basenam,"\\.")[[1]][c(1,2,4)],collapse="."),job,sep=".")
 
 # TODO: output pixelsize, OUTPUT_PROJECTION_PARAMETERS...
 paraname <- paste(outDir,"MRTgResample.prm",sep="")
@@ -160,7 +175,7 @@ unlink(paste(outDir,fsep,TmpMosNam,sep=""))
 
 } else {cat("missing files?",files,"jumping to the next date",sep="\n")}
 
-}
+} # l, avDates
 } else {cat("No files found for that product within the date range\n")}
-}
+} # i, Platform
 }
