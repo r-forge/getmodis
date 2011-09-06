@@ -18,7 +18,7 @@
 }
 
 \usage{
-getXML(LocalArcPath="", HdfName="", wait=1, quiet=FALSE)
+getXML(LocalArcPath,HdfName,checkSize=TRUE,wait=1,quiet=FALSE)
 }
 
 \arguments{
@@ -32,11 +32,12 @@ getXML(LocalArcPath="", HdfName="", wait=1, quiet=FALSE)
   for XML file presence. If \code{HdfName} is not set all found
   MODIS-XML files are gathered regarding the \code{LocalArcPath}
   setting.}
+  
+\item{checkSize}{Logical. Defoult \code{TRUE}, The main purpose of \code{getXML()} is to control if MODIS HDF files have been downloaded properly. If \code{FALSE} the function only downloads missing XML files without "checksum" the HDF files.}
 
 \item{wait}{Numeric. Default \code{1}. Inserts a break (in seconds) after every
   internal \code{download.file()} or \code{getURL()} call. It reduces
-  the chance of FTP connection error that often occurs after many
-  requests. Requires the 'audio' package. Recommended values 1 to 3
+  the chance of FTP connection error that often occurs. Requires the 'audio' package. Recommended values 1 to 3
   seconds (more files, higer value). (Hopefully \code{wait} is a
   temporary solution!)}
   

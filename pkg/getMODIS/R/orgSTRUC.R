@@ -2,19 +2,18 @@
 # Date: August 2011
 # Licence GPL v3
 
-orgSTRUC <- function(LocalArcPath,HdfName,to,move=TRUE) {
+orgSTRUC <- function(LocalArcPath,deep=FALSE,HdfName,to,move=TRUE,quiet=FALSE) {
 
 
-if (missing(to)|(!to %in% 1:3)) stop("Provide a valid 'to' argument!")
+if (missing(to)|(!to %in% c(1,2,3))) stop("Provide a valid 'to' argument!")
 
 fsep <- .Platform$file.sep
 
 if (missing(LocalArcPath)) {
-	LocalArcPath <- "~/"
+	LocalArcPath <- "~"
 	LocalArcPath <- normalizePath(path.expand(LocalArcPath), winslash = fsep)
 	LocalArcPath <- file.path(LocalArcPath,"MODIS_ARC",fsep=fsep)
-	cat(paste("No archive path set, using/creating standard archive in: ",LocalArcPath,"\n",sep=""))
-	flush.console()
+	if (!quiet) {cat(paste("No archive path set, using/creating standard archive in: ",LocalArcPath,"\n",sep=""))}
 }
 
 LocalArcPath <- paste(strsplit(LocalArcPath,fsep)[[1]],collapse=fsep)# removes "/" or "\" on last position (if present)
@@ -27,11 +26,24 @@ if (missing(HdfName)) {cat(paste("No 'HdfName' pattern set, moving/coping all MO
 
 #################
 
-if(!missing(HdfName)) {
-		avFiles <- unlist(list.files(LocalArcPath,pattern=HdfName,recursive=TRUE,full.names=TRUE))
+if(missing(HdfName)) {
+		avFiles <- unlist(list.files(
+						if(deep){
+						"~"
+						} else {
+						LocalArcPath
+						}
+						,pattern="hdf",recursive=TRUE,full.names=TRUE))
 	} else {
-		avFiles <- unlist(list.files(LocalArcPath,pattern="hdf",recursive=TRUE,full.names=TRUE))
+		avFiles <- unlist(list.files(
+						if(deep){
+						"~"
+						} else {
+						LocalArcPath
+						}
+						,pattern=HdfName,recursive=TRUE,full.names=TRUE))
 	}
+
 
 if (length(avFiles)==0) {stop("No HDF or HDF.XML files found! Maybe check 'LocalArcPath'\n")}
  
@@ -66,7 +78,7 @@ cat("Found",length(avFiles),"files \n")
 #########################
 moved <- sapply(avFiles,function(x) {
 
-	fname   <- strsplit(x,fsep)[[1]] # separate name from path
+	fname  <- strsplit(x,fsep)[[1]] # separate name from path
 	orpath <- fname[-length(fname)]
 	orpath <- paste(orpath,collapse=fsep)
 	fname   <- fname[length(fname)] # select filename
@@ -91,6 +103,7 @@ moved <- sapply(avFiles,function(x) {
 
 #if (orpath!=path) {
 if (!file.exists(file.path(path,fname,fsep=fsep))) { # do nothing if file is already in dest dir 
+
 		if (.Platform$OS.type == "unix" & move) {
 			system(paste("mv ",x," ",path,sep=""))
 			moved <- 1
@@ -98,16 +111,16 @@ if (!file.exists(file.path(path,fname,fsep=fsep))) { # do nothing if file is alr
 			shell(gsub(fsep,"\\\\",paste("move ",x," ", path,sep="")),intern=TRUE)
 			moved <- 1
 		} else {
-			file.copy(from=x,to=paste(path,"/",fname,sep=""),overwrite=FALSE)
+			file.copy(from=x,to=paste(path,fsep,fname,sep=""),overwrite=FALSE)
 			moved <- 2
 
-			if (file.exists(paste(path,"/",fname,sep="")) &  move) {
+			if (file.exists(paste(path,fsep,fname,sep="")) &  move) {
 				unlink(paste(orpath,fname,sep=""))
 			moved <- 1
 			}
 
 		}
-	} else if (orpath!=path) {
+	} else if (file.exists(file.path(path,fname,fsep=fsep)) & orpath!=path) { # if file exists in destdir & inpath!=outPath...it is duplicated, so remove it
 			unlink(x)
 			moved <- 3
 	} else {

@@ -1,9 +1,8 @@
 # Author: Matteo Mattiuzzi, matteo.mattiuzzi@boku.ac.at
 # Date : July 2011
-# Version 0.2
 # Licence GPL v3
 
-getXML <- function(LocalArcPath,HdfName="", wait=1,quiet=FALSE){
+getXML <- function(LocalArcPath,HdfName,checkSize=TRUE,wait=1,quiet=FALSE){
 
 fsep <- .Platform$file.sep
 
@@ -14,7 +13,6 @@ if (missing(LocalArcPath)) {
 	LocalArcPath <- file.path(LocalArcPath,"MODIS_ARC",fsep=fsep)
 	if(!quiet){
 	cat(paste("No archive path set, using/creating standard archive in: ",LocalArcPath,"\n",sep=""))
-	flush.console()
 	}
 }
 
@@ -26,7 +24,7 @@ if(!exists("testDir")) {stop("'LocalArcPath' not set properly!")}
 #################
 
 
-if(HdfName[1]!="") { # ...[1] is because if there are more files this query throws a warning... 
+if(!missing(HdfName)) {
 	
 	HdfName <- unlist(HdfName)
 	avFiles <- list()
@@ -39,15 +37,13 @@ if(HdfName[1]!="") { # ...[1] is because if there are more files this query thro
 		avFiles[[i]] <- grep(avFiles[[i]], pattern=".hdf$",value=TRUE) # removes xml files from list 
 		}
 	}
-	
-	 # TODO, chase where only a xml is downloaded without having the hdf
 	 
 avFiles <- unlist(avFiles)
 } else {
-avFiles <- list.files(LocalArcPath,pattern=".hdf$",recursive=TRUE,full.names=TRUE) # all hdf under the 'LocalPathToHdf'
+avFiles <- list.files(LocalArcPath,pattern=".hdf$",recursive=TRUE,full.names=TRUE) # all hdf under the 'LocalArcPath'
 }
 
-# tests if MODIS-grid file(s)
+# tests if it is a MODIS-grid file(s) (TODO function that checks that)
 doit <- sapply(avFiles,function(x) {
 	fname <- strsplit(x,"/")[[1]] # separate name from path
 	fname <- fname[length(fname)] # select filename
@@ -63,53 +59,86 @@ doit <- sapply(avFiles,function(x) {
 	return(res)}
 	)
 		
-avFiles <- avFiles[doit] 
+avFiles <- avFiles[doit]
 
+if(length(avFiles)==0) {
+	return(cat("No MODIS grid files found.\n"))
+	} else {
 
-# out from here only valid MODIS.GRID.HDFs should come
+islocal <- rep(NA,length(avFiles))
 
-if(length(avFiles)==0) {return(cat("No MODIS-XML files to download.\n"))} else { # handle situation where only Non supported Grid-HDFs are stored
-
-
-success <- rep(NA,length(avFiles))
     for (u in seq(along=avFiles)){
 
-	if ( !file.exists(paste(avFiles[u],".xml",sep="")) || # if xml-file doesn't exist 
-
-	 	if ( .Platform$OS.type == "unix") {as.numeric(system(paste("stat -c %s ",avFiles[u],".xml",sep=""), intern=TRUE)) < 2000}else{FALSE} # tested on Ubuntu 11.04
-	 	||
- 		if ( .Platform$OS.type == "windows") {as.numeric(shell(paste("for %I in (",avFiles[u],") do @echo %~zI",sep=""),intern=TRUE)) < 2000}else{FALSE} # sould work with win2000 and later...but not tested! (http://stackoverflow.com/questions/483864/windows-command-for-file-size-only)
-# 		if (!.Platform$OS.type %in% c("unix","windows")) {FALSE} # if not unix or windows, skip this test...(for now)
-	# if file exists but smaller than 2000 B...  so probably broken download
+	if (
+		!file.exists(paste(avFiles[u],".xml",sep=""))
+		| 
+		if (.Platform$OS.type == "unix" & file.exists(paste(avFiles[u],".xml",sep=""))) {
+		as.numeric(system(paste("stat -c %s ",avFiles[u],".xml",sep=""), intern=TRUE)) < 2000
+		} else if (.Platform$OS.type == "windows" & file.exists(paste(avFiles[u],".xml",sep=""))) {
+		as.numeric(shell(paste("for %I in (",avFiles[u],") do @echo %~zI",sep=""),intern=TRUE)) < 2000 # should work with win2000 and later...
+		}else{
+		FALSE
+		} 
 	){
-
 	fname <- strsplit(avFiles[u],"/")[[1]] # separate filename from path
 	fname <- fname[length(fname)]
 	secName  <- strsplit(fname,"\\.")[[1]] # decompose filename
-	PF <- substr(secName[1],1,3)
-
-	if(PF=="MOD"){PF <- "MOLT"} else {PF <- "MOLA"}
+	product <-  getPRODUCT(product=secName[1])	
 
 	fdate <- substr(secName[2],2,8)
 	fdate <- format(as.Date(as.numeric(substr(fdate,5,7))-1,origin=paste(substr(fdate,1,4),"-01-01",sep="")),"%Y.%m.%d")
 
-	version <- secName[4]
+	collection <- if (product$raster_type=="Tile") {
+				secName[4]
+			} else if (product$raster_type=="CMG") {
+				secName[3]	
+			} else {
+			stop(product$raster_type," not supported yet!")			
+			}
 
 	require(RCurl) # is it good here?
 
-	success[u] <- download.file(
-			paste("ftp://e4ftl01u.ecs.nasa.gov/", PF,"/",secName[1],".",version,"/",fdate,"/",fname,".xml",sep=""),
-			destfile=paste(avFiles[u],".xml",sep=""),
-			mode='wb', method='wget', quiet=quiet, cacheOK=FALSE)
+	islocal[u] <- download.file(
+		paste("ftp://e4ftl01u.ecs.nasa.gov/", product$PF1,"/",product$productName,".",collection,"/",fdate,"/",fname,".xml",sep=""),
+		destfile=paste(avFiles[u],".xml",sep=""),
+		mode='wb', method='wget', quiet=quiet, cacheOK=FALSE)
 
 		if (wait!=0){
 		require(audio)
 		wait(as.numeric(wait))
 		}
 	} else {
-	success[u] <- 0}
-	} # avFiles[u] 
-invisible(success)
+	islocal[u] <- 0
+	}
+
+# checksum
+if (checkSize) {
+	xml <- paste(avFiles[u],".xml",sep="")
+	require(XML)
+	xml    <- xmlParse(xml) # removed "try()". T think it was just forgotten after a test!
+	MetaSize <- getNodeSet( xml, "/GranuleMetaDataFile/GranuleURMetaData/DataFiles/DataFileContainer/FileSize" )
+	MetaSize <- as.numeric(xmlValue(MetaSize[[1]]))
+
+	if (.Platform$OS.type == "unix") {
+		FileSize <- as.numeric(system(paste("stat -c %s ",avFiles[u],sep=""), intern=TRUE))
+	} else if (.Platform$OS.type == "windows") {
+		FileSize <- as.numeric(shell(paste("for %I in (",avFiles[u],") do @echo %~zI",sep=""),intern=TRUE))
+	} else {
+	stop("Only Unix based and Windows supported, please tell me which system you use!")
+	}
+	
+	if (MetaSize != FileSize) {
+		if(!quiet){
+			cat("\nMETA check for file:",avFiles[u],"\nFileSize:",FileSize,"but expected:",MetaSize,"\n")
+		}
+	getHDF(HdfName=avFiles[u])
+	} else {
+	cat("\nSize check for ",avFiles[u], "done!\n\n")
+	}
+}
+
+}
+invisible(islocal)
 } # if avFiles > 0
-} # end getMODIS::.getXML
+}
 

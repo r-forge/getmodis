@@ -8,17 +8,9 @@ getTILE <- function(tileH,tileV,extent) {
 ###########################################
 # from maps
 
-#if (!missing(extent) && class(map)){
-#stop("Maps object not supported yet!")
-
-#require(maps)
-#NAT <- identify(map("world",fill=T,col="red"))
-#extent <- map("world",NAT)$range
-
-# ex <- map("world")
-# is <- grep(ex$names,pattern="Austria",ignore.case=T)
-
-#}
+if (!missing(extent) && inherits(extent,"map")){
+extent <- list(lat_min=min(extent$range[3:4]),lat_max=max(extent$range[3:4]),lon_min=min(extent$range[1:2]),lon_max=max(extent$range[1:2]))
+}
 ############################################
 # extent class "raster* object (extent)"
 if (!missing(extent) && class(extent) %in% c("Extent","RasterLayer","RasterStack","RasterBrick") ){

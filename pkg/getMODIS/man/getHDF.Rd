@@ -3,7 +3,7 @@
 \docType{methods}
 
 \alias{getHDF}
-\alias{getHDF, LocalArcPath, HdfName, product, startdate, enddate, tileH, tileV, extent, collection, quiet, wait, checkXML,log}
+\alias{getHDF, LocalArcPath, HdfName, product, startdate, enddate, tileH, tileV, extent, collection, quiet, wait, checkSize,log}
 
 \title{Create or update a local, user-defined subset of the global online
   MODIS grid data pool.}
@@ -17,7 +17,7 @@
   update of local MODIS data archive.
 }
 
-\usage{getHDF(LocalArcPath, HdfName, product, startdate, enddate, tileH, tileV, extent, collection, quiet=FALSE, wait=1, checkXML=FALSE,log=TRUE)}
+\usage{getHDF(LocalArcPath, HdfName, product, startdate, enddate, tileH, tileV, extent, collection, quiet=FALSE, wait=1, checkSize=FALSE,log=TRUE)}
 
 \arguments{
 
@@ -39,7 +39,7 @@
 
   \item{extent}{see \code{'extent'} in \code{?getTILE}.}
  
-  \item{checkXML}{Logical. Default \code{FALSE}, MODIS-XML files are not downloaded with their MODIS-HDF file. If \code{TRUE} MODIS-HDF and corresponding MODIS-XML files are checked and downloaded. (At the moment it just checks MODIS-XML availability, will soon become a 'checksum' function for local MODIS-HDF files.)}
+  \item{checkSize}{Logical. Default \code{FALSE}, MODIS-XML files are not downloaded with their MODIS-HDF file and a "checkSum" is not done. If \code{TRUE} MODIS-HDF and corresponding MODIS-XML files are checked and downloaded and the filesize is checked. (!keep FALSE for now!)}
     
   \item{wait}{Numeric. Default \code{1}. Inserts a break (in seconds) after every internal \code{download.file()} or \code{getURL()} call. It reduces the chance of FTP connection error that often occurs after many requests. Requires the 'audio' package. (Hopefully a temporary solution!)}
 

@@ -17,7 +17,7 @@ if        (PF %in% c("x","X")) { PF1  <- c("MOLT", "MOLA"); PF2  <- c("MOD", "MY
 } else if (PF %in% c("y","Y")) { PF1  <- "MOLA"; PF2 <- "MYD"
 } else if (PF %in% c("o","O")) { PF1  <- "MOLT"; PF2 <- "MOD"
 } else if (PF %in% c("c","C")) { PF1  <- "MOTA"; PF2 <- "MCD"
-} else {stop("Check 'product', the Platform specific part seams wrong. Not one of 'MOD','MYD','MXD','MCD'.")
+} else {stop("Check 'product', the Platform specific part seams wrong.\n",PF,"\n Not one of 'MOD','MYD','MXD','MCD'.")
 }
 
 # Check product
