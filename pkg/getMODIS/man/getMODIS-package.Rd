@@ -7,7 +7,7 @@
 \title{Functions for selective MODIS-GRID-data download or update. And pre-processing routines (cropping, reprojecting, mosaicing, SDS extraction, bitmask extraction) usin MRT software.}
  
 \description{
-Functions for selective 'mirroring' of the global MODIS data pool (\url{ftp://e4ftl01u.ecs.nasa.gov/}). Simple parameters are defining: modis-product, collection, area/tile and period. The functions are performing the following tasks: if not existing it creates a local archive structure equivalent to the online storage (or a simplified structure), checks if files are already stored locally, if not download the needed file(s).
+Functions for selective 'mirroring' of the global MODIS data pool (starting from version 0.2.4: \url{ftp://e4ftl01.cr.usgs.gov/},until version 0.2-3: \url{ftp://e4ftl01u.ecs.nasa.gov/}). Simple parameters are defining: modis-product, collection, area/tile and period. The functions are performing the following tasks: if not existing it creates a local archive structure equivalent to the online storage (or a simplified structure), checks if files are already stored locally, if not download the needed file(s).
 
 Installing MODIS ReprojectionTool MRT software it is possible to further process downloaded data:
 

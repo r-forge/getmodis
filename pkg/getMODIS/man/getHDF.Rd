@@ -10,7 +10,7 @@
 
 \description{
   Create or update a local user-defined subset of the global MODIS grid
-  data archive (\url{ftp://e4ftl01u.ecs.nasa.gov/}). Based on
+  data archive (starting from version 0.2.4: \url{ftp://e4ftl01.cr.usgs.gov/},until version 0.2-3: \url{ftp://e4ftl01u.ecs.nasa.gov/}). Based on
   user-specific parameters the function checks in the local archive for
   available data and downloads missing data from the online MODIS data
   pool. When run in a schedule job, the function manage the continuous

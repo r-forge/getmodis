@@ -98,8 +98,10 @@ islocal <- rep(NA,length(avFiles))
 
 	require(RCurl) # is it good here?
 
+
 	islocal[u] <- download.file(
-		paste("ftp://e4ftl01u.ecs.nasa.gov/", product$PF1,"/",product$productName,".",collection,"/",fdate,"/",fname,".xml",sep=""),
+#		paste("ftp://e4ftl01u.ecs.nasa.gov/", product$PF1,"/",product$productName,".",collection,"/",fdate,"/",fname,".xml",sep=""),
+		paste("ftp://e4ftl01.cr.usgs.gov/", product$PF1,"/",product$productName,".",collection,"/",fdate,"/",fname,".xml",sep=""),
 		destfile=paste(avFiles[u],".xml",sep=""),
 		mode='wb', method='wget', quiet=quiet, cacheOK=FALSE)
 

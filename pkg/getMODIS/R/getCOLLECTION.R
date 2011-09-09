@@ -34,7 +34,9 @@ for (i in 1:length(product$PF1)){
 
 	if (forceCheck | !product$productName[i] %in% colnames(ftpdirs) ) {
 
-		ftp <- paste("ftp://e4ftl01u.ecs.nasa.gov/",product$PF1[i],"/",sep="")
+		ftp <- paste("ftp://e4ftl01.cr.usgs.gov/",product$PF1[i],"/",sep="")
+		# ftp <- paste("ftp://e4ftl01u.ecs.nasa.gov/",product$PF1[i],"/",sep="")
+		
 	
 		require(RCurl)
 		dirs  <- getURL(ftp)

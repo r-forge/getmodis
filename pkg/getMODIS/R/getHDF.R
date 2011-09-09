@@ -60,7 +60,9 @@ if (!missing(HdfName)){
 	
 		if (!file.exists(paste(LocalArcPath,fsep,arcPath,HdfName[i],sep=""))) {
 		  require(RCurl)
-			ftpPath <- paste("ftp://e4ftl01u.ecs.nasa.gov/",product$PF1,"/", product$productName,".",collection,"/",fdate,"/",HdfName[i],sep="")
+		  ftpPath <- paste("ftp://e4ftl01.cr.usgs.gov/",product$PF1,"/", product$productName,".",collection,"/",fdate,"/",HdfName[i],sep="")
+#			ftpPath <- paste("ftp://e4ftl01u.ecs.nasa.gov/",product$PF1,"/", product$productName,".",collection,"/",fdate,"/",HdfName[i],sep="")
+
 		download.file(
 			ftpPath,
 			destfile=paste(LocalArcPath,fsep,arcPath,HdfName[i],sep=""),
@@ -126,7 +128,9 @@ for(z in 1:length(product$PF1)){ # Platforms MOD/MYD
 
 	productName <- product$productName[z]
 	
-	ftp <- paste("ftp://e4ftl01u.ecs.nasa.gov/", product$PF1[z],"/", product$productName[z],".",collection,"/",sep="")
+
+	ftp <- paste("ftp://e4ftl01.cr.usgs.gov/", product$PF1[z],"/", product$productName[z],".",collection,"/",sep="")
+	#ftp <- paste("ftp://e4ftl01u.ecs.nasa.gov/", product$PF1[z],"/", product$productName[z],".",collection,"/",sep="")
 
 	ftpdirs <- getSTRUC(LocalArcPath=LocalArcPath,product=product$productName[z],collection=collection,startdate=startdate,enddate=enddate,wait=0)
 		if (wait > 0){wait(as.numeric(wait))}
