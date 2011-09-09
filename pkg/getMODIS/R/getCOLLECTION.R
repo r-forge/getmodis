@@ -8,8 +8,7 @@ getCOLLECTION <- function(LocalArcPath,product,collection,newest=TRUE,forceCheck
 fsep <- .Platform$file.sep
 
 if (missing(LocalArcPath)) {
-	LocalArcPath <- "~/"
-	LocalArcPath <- normalizePath(path.expand(LocalArcPath), winslash = fsep)
+	LocalArcPath <- normalizePath("~", winslash = fsep)
 	LocalArcPath <- file.path(LocalArcPath,"MODIS_ARC",fsep=fsep)
 } 
 LocalArcPath <- paste(strsplit(LocalArcPath,fsep)[[1]],collapse=fsep)# removes "/" or "\" on last position (if present)

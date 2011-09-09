@@ -7,13 +7,12 @@ getXML <- function(LocalArcPath,HdfName,checkSize=TRUE,wait=1,quiet=FALSE){
 fsep <- .Platform$file.sep
 
 if (missing(LocalArcPath)) {
-	LocalArcPath <- "~/"
-	LocalArcPath <- normalizePath(path.expand(LocalArcPath), winslash = fsep)
-	LocalArcPath <- paste(strsplit(LocalArcPath,fsep)[[1]],collapse=fsep)# removes "/" or "\" on last position (if present)
+	LocalArcPath <- normalizePath("~", winslash = fsep)
 	LocalArcPath <- file.path(LocalArcPath,"MODIS_ARC",fsep=fsep)
-	if(!quiet){
-	cat(paste("No archive path set, using/creating standard archive in: ",LocalArcPath,"\n",sep=""))
-	}
+		if(!quiet){
+		cat(paste("No archive path set, using/creating standard archive in: ",LocalArcPath,"\n",sep=""))
+		flush.console()
+		}
 }
 
 LocalArcPath <- paste(strsplit(LocalArcPath,fsep)[[1]],collapse=fsep)# removes "/" or "\" on last position (if present)

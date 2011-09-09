@@ -5,8 +5,6 @@
 
 runMRT <- function(LocalArcPath,ParaSource, MRTpath = "check",quiet=FALSE) {
 
-fsep <- .Platform$file.sep
-
 if (missing(ParaSource)) {
 	ParaEx <- file.path(find.package('getMODIS'),'external','ParaExample.R')
 	stop(paste("Provide a valid 'ParaSource' file, see or use: '",ParaEx,"'",sep=""))
@@ -14,13 +12,15 @@ if (missing(ParaSource)) {
 	source(ParaSource)
 	}
 
+fsep <- .Platform$file.sep
+
 if (missing(LocalArcPath)) {
-	LocalArcPath <- "~/"
-	LocalArcPath <- normalizePath(path.expand(LocalArcPath), winslash = fsep)
-	LocalArcPath <- paste(strsplit(LocalArcPath,fsep)[[1]],collapse=fsep) # removes "/" or "\" on last position (if present)
+	LocalArcPath <- normalizePath("~", winslash = fsep)
 	LocalArcPath <- file.path(LocalArcPath,"MODIS_ARC",fsep=fsep)
-	cat(paste("No archive path set, using/creating standard archive in: ",LocalArcPath,"\n",sep=""))
-	flush.console()
+		if(!quiet){
+		cat(paste("No archive path set, using/creating standard archive in: ",LocalArcPath,"\n",sep=""))
+		flush.console()
+		}
 }
 
 LocalArcPath <- paste(strsplit(LocalArcPath,fsep)[[1]],collapse=fsep) # removes "/" or "\" on last position (if present)

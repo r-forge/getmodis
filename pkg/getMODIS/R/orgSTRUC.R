@@ -10,10 +10,12 @@ if (missing(to)|(!to %in% c(1,2,3))) stop("Provide a valid 'to' argument!")
 fsep <- .Platform$file.sep
 
 if (missing(LocalArcPath)) {
-	LocalArcPath <- "~"
-	LocalArcPath <- normalizePath(path.expand(LocalArcPath), winslash = fsep)
+	LocalArcPath <- normalizePath("~", winslash = fsep)
 	LocalArcPath <- file.path(LocalArcPath,"MODIS_ARC",fsep=fsep)
-	if (!quiet) {cat(paste("No archive path set, using/creating standard archive in: ",LocalArcPath,"\n",sep=""))}
+		if(!quiet){
+		cat(paste("No archive path set, using/creating standard archive in: ",LocalArcPath,"\n",sep=""))
+		flush.console()
+		}
 }
 
 LocalArcPath <- paste(strsplit(LocalArcPath,fsep)[[1]],collapse=fsep)# removes "/" or "\" on last position (if present)
