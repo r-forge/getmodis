@@ -21,21 +21,15 @@ if (Sys.getenv("MRT_HOME")!=""){
           }   
       }
       
-MRTpath <- list.files(path = if(deep){"/"}else{"."}, pattern = "mrtmosaic",full.names = TRUE, recursive = TRUE,ignore.case = FALSE)
+MRTpath <- list.files(path = if(deep){"/"}else{"~"}, pattern = "mrtmosaic",full.names = TRUE, recursive = TRUE,ignore.case = FALSE)
 
 
 #if (length(MRTpath == 1)){
 #	MRTpath
  if (length(MRTpath >= 1)) {
-	isit    <- strsplit(MRTpath,fsep)
-	getBIN  <- sapply(isit,function(x){x[(length(x)-1)]=="bin"})
 
-		if(sum(as.numeric(getBIN))==1){
-		getBIN  <- which(getBIN==TRUE)
-		isit <- isit[[getBIN]]
-		MRTpath <- file.path(isit[-length(isit)],fsep=fsep) # this does not work?!
-	MRTpath <- paste(MRTpath,collapse=fsep,sep="")
-		} else if (sum(as.numeric(getBIN)) > 1 & !quiet) {
+	MRTpath <- dirname(MRTpath)
+		if(length(MRTpath)>1 & !quiet){
 		cat("I'm not sure, is it one of those?\n")
 		}
 } else {
