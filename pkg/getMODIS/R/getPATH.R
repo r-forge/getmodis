@@ -8,12 +8,10 @@ getPATH <- function(deep=FALSE,quiet=FALSE){
 
 fsep <- .Platform$file.sep
 
-
 if (Sys.getenv("MRT_HOME")!=""){
 	MRTpath <- Sys.getenv("MRT_HOME")
 	MRTpath <- normalizePath(MRTpath,winslash=fsep)
 	MRTpath <- file.path(MRTpath,"bin",fsep=fsep)
-	if (!quiet) cat("If this path doesn't work, check if your path is set proprely\n")
 }else{  
   if (!quiet) {
       if (deep) {
@@ -26,23 +24,23 @@ if (Sys.getenv("MRT_HOME")!=""){
 MRTpath <- list.files(path = if(deep){"/"}else{"."}, pattern = "mrtmosaic",full.names = TRUE, recursive = TRUE,ignore.case = FALSE)
 
 
-if (length(MRTpath == 1)){
-	MRTpath
-} else if (length(MRTpath > 1)) {
+#if (length(MRTpath == 1)){
+#	MRTpath
+ if (length(MRTpath >= 1)) {
 	isit    <- strsplit(MRTpath,fsep)
 	getBIN  <- sapply(isit,function(x){x[(length(x)-1)]=="bin"})
 
 		if(sum(as.numeric(getBIN))==1){
 		getBIN  <- which(getBIN==TRUE)
 		isit <- isit[[getBIN]]
-		MRTpath <- file.path(isit[-length(isit)],fsep=fsep)
-	MRTpath <- paste(MRTpath,fsep,sep="")
+		MRTpath <- file.path(isit[-length(isit)],fsep=fsep) # this does not work?!
+	MRTpath <- paste(MRTpath,collapse=fsep,sep="")
 		} else if (sum(as.numeric(getBIN)) > 1 & !quiet) {
 		cat("I'm not sure, is it one of those?\n")
 		}
 } else {
 	if (!quiet){
-		cat("MRT not found, sorry but you have to solve this problem first\n")
+		cat("MRT not found, sorry but you have to solve this problem first.\nMay MRT is not installed properly\n")
 	}
 	MRTpath <- 0
 	}
