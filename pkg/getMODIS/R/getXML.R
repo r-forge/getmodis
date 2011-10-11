@@ -134,7 +134,7 @@ if (checkSize) {
 		}
 	getHDF(HdfName=avFiles[u])
 	} else {
-	cat("\nSize check for ",avFiles[u], "done!\n\n")
+	cat("\nSize check for: ",avFiles[u], "done!\n\n")
 	}
 }
 
