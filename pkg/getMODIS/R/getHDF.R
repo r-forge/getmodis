@@ -131,7 +131,8 @@ for(z in 1:length(product$PF1)){ # Platforms MOD/MYD
 	#ftp <- paste("ftp://e4ftl01u.ecs.nasa.gov/", product$PF1[z],"/", product$productName[z],".",collection,"/",sep="")
 
 	ftpdirs <- getSTRUC(LocalArcPath=LocalArcPath,product=product$productName[z],collection=collection,startdate=startdate,enddate=enddate,wait=0)
-		if (wait > 0){wait(as.numeric(wait))}
+		
+#		if (wait > 0){wait(as.numeric(wait))}
 		
 	ftpdirs <- ftpdirs[,which(colnames(ftpdirs)==paste(product$productName[z],".",collection,sep=""))] 
 	ftpdirs <- ftpdirs[!is.na(ftpdirs)]

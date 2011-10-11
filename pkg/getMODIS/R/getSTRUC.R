@@ -107,12 +107,12 @@ for (i in 1:length(product$PF2)){
 	}
 
 
-	if (createNew) { # put it to ftpdir.txt
+	if (createNew) { # write/update to ftpdir.txt
 		FtpDayDirs <- matrix(FtpDayDirs)
 		mtr <- matrix(NA,ncol=ncol(ftpdirs)+1,nrow=max(length(FtpDayDirs),dim(ftpdirs)[1]))
 		colnames(mtr) <- if(ncol(ftpdirs)>0){c(colnames(ftpdirs),productNameFull)} else {productNameFull}	
 			
-			if (ncol(ftpdirs)!=0){ # relevant only for time
+			if (ncol(ftpdirs)!=0){ # relevant only for the first time
 				for(j in 1:ncol(ftpdirs)){
 					mtr[,j] <- replace(mtr[,j], 1:nrow(ftpdirs),ftpdirs[,j])
 				}
