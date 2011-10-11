@@ -1,6 +1,5 @@
 # Author: Matteo Mattiuzzi, matteo.mattiuzzi@boku.ac.at
 # Date : August 2011
-# Version 0.1
 # Licence GPL v3
 
 getTILE <- function(tileH,tileV,extent) {
@@ -14,8 +13,6 @@ extent <- list(lat_min=min(extent$range[3:4]),lat_max=max(extent$range[3:4]),lon
 ############################################
 # extent class "raster* object (extent)"
 if (!missing(extent) && class(extent) %in% c("Extent","RasterLayer","RasterStack","RasterBrick") ){
-
-require(raster) # should allready be loaded... but anyway
 
 	if (class(extent) != "Extent"){  
 		extent <- extent(extent)# checking if lat/lon !!??
