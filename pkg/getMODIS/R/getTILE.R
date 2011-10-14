@@ -4,15 +4,29 @@
 
 getTILE <- function(tileH,tileV,extent) {
 
+if(missing(extent)) {
+extent <- ""
+} else {
 ###########################################
-# from maps
+# from mapdata/maps 
 
-if (!missing(extent) && inherits(extent,"map")){
+if (inherits(extent,"map")){
+extent <- list(lat_min=min(extent$range[3:4]),lat_max=max(extent$range[3:4]),lon_min=min(extent$range[1:2]),lon_max=max(extent$range[1:2]))
+}
+
+if (inherits(extent,"character")){
+require(mapdata)
+try(test <- map('worldHires',xtent,plot=FALSE),silent=TRUE)
+	if (exists("test")){
+		extent  <- map('worldHires',extent,plot=FALSE)
+	} else {
+		stop(paste("Country name not found, check availability/spelling in the 'mapdata' package i.e.: map('wolrdHighres','",extent,"')",sep=""))
+	}
 extent <- list(lat_min=min(extent$range[3:4]),lat_max=max(extent$range[3:4]),lon_min=min(extent$range[1:2]),lon_max=max(extent$range[1:2]))
 }
 ############################################
 # extent class "raster* object (extent)"
-if (!missing(extent) && class(extent) %in% c("Extent","RasterLayer","RasterStack","RasterBrick") ){
+if (class(extent) %in% c("Extent","RasterLayer","RasterStack","RasterBrick") ){
 
 	if (class(extent) != "Extent"){  
 		extent <- extent(extent)# checking if lat/lon !!??
@@ -20,10 +34,12 @@ if (!missing(extent) && class(extent) %in% c("Extent","RasterLayer","RasterStack
 
 extent <- list(lat_min=extent@ymin,lat_max=extent@ymax,lon_min=extent@xmin,lon_max=extent@xmax)
 }
-
 ####################################
 # extent class "list"
-if (!missing(extent) && class(extent) == "list"){ # !missing() refers to function var, class() can be result of if raster&Co...
+if (inherits(extent,"list")){ # if it did exist it should have biéen changed to a list!
+
+if(length(extent$extent)==4) {extent<-extent$extent}
+
 
 data("tiletable")
 
@@ -42,21 +58,23 @@ data("tiletable")
   tileV <- minTile[1]:maxTile[1]
   tileH <- minTile[2]:maxTile[2]
 }
-
+#
+} 
 ###################################
 # get the results
 tiles <- list()
 
 tileH <- as.vector(tileH)
-	if (tileH < 0 || tileH > 36) {stop("'tileH' number(s) must be between 0 and 35")}
+	if (tileH < 0 || tileH > 35) {stop("'tileH' number(s) must be between 0 and 35")}
 tileV <- as.vector(tileV)
-	if (tileV < 0 || tileV > 17) {stop("'tileV' number(s) must be between 0 and 17")}
+	if (tileV < 0 || tileV > 16) {stop("'tileV' number(s) must be between 0 and 17")}
 	
 for (i in seq(along=tileH)){
 	tiles[[i]] <- paste("h",sprintf("%02d",tileH[i]),"v",sprintf("%02d",tileV),sep="")	
 }
-result <- list(tile=unlist(tiles),tileH=tileH,tileV=tileV)
+result <- list(tile=unlist(tiles),tileH=tileH,tileV=tileV,extent=extent)
 
 return(result)
 }
+
 

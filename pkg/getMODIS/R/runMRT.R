@@ -85,6 +85,7 @@ if (MRTpath=="check") {
 if (!file.exists(MRTpath)) {stop("'MRTpath' is wrong. Provide a good path, leave empty or run 'getPATH()'")}
 
 product <- getPRODUCT(product=product)
+extent <- getTILE(extent=extent)
 
 # check collection
 if (!exists("collection")) {
@@ -158,8 +159,10 @@ paraname <- paste(outDir,"MRTgResample.prm",sep="")
 filename = file(paraname, open="wt")
 write(paste('INPUT_FILENAME = ',outDir,fsep,TmpMosNam,sep=""), filename)
 write('SPATIAL_SUBSET_TYPE = INPUT_LAT_LONG',filename)
-write(paste('SPATIAL_SUBSET_UL_CORNER = (',extent$lat_max,' ',extent$lon_min,')',sep=''),filename)
-write(paste('SPATIAL_SUBSET_LR_CORNER = (',extent$lat_min,' ',extent$lon_max,')',sep=''),filename)
+if (extent$extent!=""){
+write(paste('SPATIAL_SUBSET_UL_CORNER = (',extent$extent$lat_max,' ',extent$extent$lon_min,')',sep=''),filename)
+write(paste('SPATIAL_SUBSET_LR_CORNER = (',extent$extent$lat_min,' ',extent$extent$lon_max,')',sep=''),filename)
+}
 write(paste('OUTPUT_FILENAME = ',outDir,fsep,basenam,'.tif',sep=''),filename) 
 write(paste('RESAMPLING_TYPE = ',resample,sep=''),filename)
 write(paste('OUTPUT_PROJECTION_TYPE = ',outProj,sep=''),filename)
