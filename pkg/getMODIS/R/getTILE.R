@@ -16,7 +16,7 @@ extent <- list(lat_min=min(extent$range[3:4]),lat_max=max(extent$range[3:4]),lon
 
 if (inherits(extent,"character")){
 require(mapdata)
-try(test <- map('worldHires',xtent,plot=FALSE),silent=TRUE)
+try(test <- map('worldHires',extent,plot=FALSE),silent=TRUE)
 	if (exists("test")){
 		extent  <- map('worldHires',extent,plot=FALSE)
 	} else {
