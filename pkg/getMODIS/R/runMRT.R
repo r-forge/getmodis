@@ -159,7 +159,7 @@ paraname <- paste(outDir,"MRTgResample.prm",sep="")
 filename = file(paraname, open="wt")
 write(paste('INPUT_FILENAME = ',outDir,fsep,TmpMosNam,sep=""), filename)
 write('SPATIAL_SUBSET_TYPE = INPUT_LAT_LONG',filename)
-if (extent$extent!=""){
+if (extent$extent[1]!=""){
 write(paste('SPATIAL_SUBSET_UL_CORNER = (',extent$extent$lat_max,' ',extent$extent$lon_min,')',sep=''),filename)
 write(paste('SPATIAL_SUBSET_LR_CORNER = (',extent$extent$lat_min,' ',extent$extent$lon_max,')',sep=''),filename)
 }

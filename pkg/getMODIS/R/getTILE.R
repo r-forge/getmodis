@@ -20,7 +20,7 @@ try(test <- map('worldHires',extent,plot=FALSE),silent=TRUE)
 	if (exists("test")){
 		extent  <- map('worldHires',extent,plot=FALSE)
 	} else {
-		stop(paste("Country name not found, check availability/spelling in the 'mapdata' package i.e.: map('wolrdHighres','",extent,"')",sep=""))
+		stop(paste("Country name not found. Check availability/spelling in the 'mapdata' package i.e.: map('wolrdHighres','",extent,"')",sep=""))
 	}
 extent <- list(lat_min=min(extent$range[3:4]),lat_max=max(extent$range[3:4]),lon_min=min(extent$range[1:2]),lon_max=max(extent$range[1:2]))
 }
