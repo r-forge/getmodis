@@ -23,7 +23,10 @@ Get MODIS tile id(s) for a geographic area.
 }
 
 \details{
-\item{extent}{If List: \code{myExtent <- list(lat_min=mumeric, lat_max=mumeric, lon_max=mumeric, lon_min=mumeric)}. If \code{character}, the country name from \code{mapdata}. Or one of the following objects \code{'extent','rasterLayer','rasterStack'} or \code{'rasterBrick'} from \code{package(raster)}.}
+\code{extent}: \cr
+If 'list': \code{myExtent <- list(lat_min=mumeric, lat_max=mumeric, lon_max=mumeric, lon_min=mumeric)}.\cr
+If 'character', the country name from \code{mapdata}. \cr
+Or one of the following objects \code{'extent','rasterLayer','rasterStack'} or \code{'rasterBrick'} from \code{package(raster)}.
 }
 
 \value{List}
@@ -52,10 +55,10 @@ rasterObject <- raster(xmn=9.2,xmx=17.47,ymn=46.12,ymx=49.3)
 getTILE(extent=rasterObject)
 
 ext <- extent(rasterObject)
-# ex
+# raster extent
 getTILE(extent=ext)
 
-require(mapdata)
+# require(mapdata)
 getTILE(extent="austria")
 
 }
