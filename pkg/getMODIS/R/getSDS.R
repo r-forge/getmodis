@@ -9,7 +9,7 @@ if (MRTpath=="check") {
 if (!file.exists(MRTpath)) {stop("'MRTpath' is wrong or MRT not installed? Provide a good path, leave empty or run 'getPATH()' first!")}
 
 if (!file.exists(HdfName)) {
-	cat("Hm, I have to search for the file! Next time provide the path too and I'll be very fast!\n")
+	cat("Hm, I have to search for the file! Next time provide the full path and I'll be very fast!\n")
 	HdfName <- normalizePath(list.files(path="~/",pattern=paste(HdfName,"$",sep=""),recursive=TRUE,full.names = TRUE),winslash=fsep)
 	}
 	
@@ -37,8 +37,8 @@ if (!missing(SDSstring)){
 	if (inherits(SDSstring,"list")) {
 		SDSstring <- paste(SDSstring$SDSstring,collapse="")
 		}
-	
-SDSstring <- gsub(pattern=" ",replacement="",x=SDSstring) # collapse the spaces
+SDSstring <- paste(SDSstring,collapse="")# collapse the spaces 
+#SDSstring <- gsub(pattern=" ",replacement="",x=SDSstring) # collapse the spaces
 
 	if (nchar(SDSstring)!= length(sds)) {
 		stop("The file has ",length(sds)," layers (SDS), your SDSstring has length ",nchar(SDSstring),"!")

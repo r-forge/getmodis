@@ -121,6 +121,8 @@ if (substr(product$PD,3,nchar(product$PD))=="CMG") {
 auxPATH <- file.path(LocalArcPath,".auxiliaries",fsep=fsep)
 
 dates  <- list()
+output <- list() # path info for the invisible output
+l=0
 
 for(z in 1:length(product$PF1)){ # Platforms MOD/MYD
 
@@ -146,7 +148,6 @@ for(z in 1:length(product$PF1)){ # Platforms MOD/MYD
 
 	dates[[z]] <- cbind(dates[[z]],matrix(rep(NA, length(dates[[z]])*ntiles),ncol=ntiles,nrow=length(dates[[z]])))
 	colnames(dates[[z]]) <- c("date",tileID)
-
 
 	for (i in 1:nrow(dates[[z]])){
 
@@ -221,21 +222,23 @@ if (log) {
 	}
 	
 if(checkSize){
-	xml <-  getXML(HdfName = list(paste(arcPath,dates[[z]][i,-1],sep="")),wait=wait)
+	xml <-  getXML(HdfName = list(paste(arcPath,dates[[z]][i,-1],sep="")),wait=wait,quiet=quiet)
 	} # list() should not be needed
 
+l=l+1
+output[[l]] <- paste(arcPath,dates[[z]][i,-1],sep="")
 } # end dates i 
 }else{
-		if (!quiet){
+#		if (!quiet){
 	cat(paste("No files on ftp in date range for: ",product$PF2[z],product$PD,".",collection,"\n\n",sep=""))
-		}
+#		}
 	}
 } # if no files are avalable for product in date AND end platform z
 } # end if not HdfName
 if (length(dim(dates))==2) {
-			invisible(paste(arcPath,dates[,-1],sep=""))
+			invisible(paste(unlist(output),sep=""))
 		} else {
-			invisible(paste(arcPath,unlist(dates)[-1],sep=""))
+			invisible(paste(unlist(output),sep=""))
 		}
 } ## END: FTP vs ARC check and download 
 
