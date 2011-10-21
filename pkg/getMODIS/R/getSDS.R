@@ -37,8 +37,8 @@ if (!missing(SDSstring)){
 	if (inherits(SDSstring,"list")) {
 		SDSstring <- paste(SDSstring$SDSstring,collapse="")
 		}
-SDSstring <- paste(SDSstring,collapse="")# collapse the spaces 
-#SDSstring <- gsub(pattern=" ",replacement="",x=SDSstring) # collapse the spaces
+#SDSstring <- paste(SDSstring,collapse="")# collapse the spaces 
+SDSstring <- gsub(pattern=" ",replacement="",x=SDSstring) # collapse the spaces
 
 	if (nchar(SDSstring)!= length(sds)) {
 		stop("The file has ",length(sds)," layers (SDS), your SDSstring has length ",nchar(SDSstring),"!")
