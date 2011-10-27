@@ -24,9 +24,11 @@ Maintainer: Matteo Mattiuzzi \email{matteo.mattiuzzi@boku.ac.at}
 
 \references{
 MODIS data pool home page with list of data access possibilities: \url{https://lpdaac.usgs.gov/lpdaac/get_data/data_pool}\cr
-MODIS data pool server: \url{ftp://e4ftl01u.ecs.nasa.gov/}\cr
+MODIS data pool server: \url{ftp://e4ftl01.cr.usgs.gov/}\cr
 MODIS home page: \url{http://modis.gsfc.nasa.gov/}\cr
-other will follow
+
+A great thanks to Tomislav Hengel. 'getMODIS' has its origin in his code see: \url{http://spatial-analyst.net/wiki/index.php?title=Download_and_resampling_of_MODIS_images}.
+
 }
 
 \keyword{package}

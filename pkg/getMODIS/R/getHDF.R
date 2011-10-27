@@ -3,7 +3,7 @@
 # Licence GPL v3
   
 
-getHDF <- function(LocalArcPath,HdfName,product,startdate,enddate,tileH,tileV,extent,collection,quiet=FALSE,wait=1,checkSize=FALSE,log=TRUE) {
+getHDF <- function(LocalArcPath,HdfName,product,startdate,enddate,tileH,tileV,extent,collection,dlmethod="auto",quiet=FALSE,wait=1,checkSize=FALSE,log=TRUE) {
 
 if (wait > 0){require(audio)} # waiting seams to decrease the chance of ftp rejection!
 
@@ -64,7 +64,7 @@ if (!missing(HdfName)){
 		download.file(
 			ftpPath,
 			destfile=paste(LocalArcPath,fsep,arcPath,HdfName[i],sep=""),
-			mode='wb', method='wget', quiet=quiet, cacheOK=FALSE)
+			mode='wb', method=dlmethod, quiet=quiet, cacheOK=FALSE)
 			
 			if (wait>0) {
 				wait(as.numeric(wait))
@@ -155,7 +155,7 @@ for(z in 1:length(product$PF1)){ # Platforms MOD/MYD
 		doy  <- as.integer(format(as.Date(dates[[z]][i,1],format="%Y.%m.%d"), "%j"))
 		doy  <- sprintf("%03d",doy)
 		datu <- paste("A",year,doy,sep="")
-		mtr  <- rep(1,ntiles) # for file situation flaging
+		mtr  <- rep(1,ntiles) # for file availability flaging
 
 # creates local directory (HDF file container)
 arcPath <- paste(LocalArcPath,fsep,product$PF2[z],product$PD,".",collection,fsep,dates[[z]][i,1],fsep,sep="")
@@ -206,7 +206,7 @@ if (sum(mtr)!=0) { # if one or more of the tiles in date is missing, its necessa
 				HDF <- HDF[which.max(unlist(select))]		
 				}
 			dates[[z]][i,j+1] <- HDF
-			hdf <- download.file(paste(ftp, dates[[z]][i,1], "/", HDF,sep=""), destfile=paste(arcPath, HDF, sep=""), mode='wb', method='wget', quiet=quiet, cacheOK=FALSE)
+			hdf <- download.file(paste(ftp, dates[[z]][i,1], "/", HDF,sep=""), destfile=paste(arcPath, HDF, sep=""), mode='wb', method=dlmethod, quiet=quiet, cacheOK=FALSE)
 			mtr[j] <- hdf
 				if (wait > 0){wait(as.numeric(wait))}
 			}

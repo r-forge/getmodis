@@ -3,7 +3,7 @@
 \docType{methods}
 
 \alias{getHDF}
-\alias{getHDF, LocalArcPath, HdfName, product, startdate, enddate, tileH, tileV, extent, collection, quiet, wait, checkSize,log}
+\alias{getHDF, LocalArcPath, HdfName, product, startdate, enddate, tileH, tileV, extent, collection, dlmethod, quiet, wait, checkSize, log}
 
 \title{Create or update a local, user-defined subset of the global online
   MODIS grid data pool.}
@@ -17,7 +17,7 @@
   update of local MODIS data archive.
 }
 
-\usage{getHDF(LocalArcPath, HdfName, product, startdate, enddate, tileH, tileV, extent, collection, quiet=FALSE, wait=1, checkSize=FALSE,log=TRUE)}
+\usage{getHDF(LocalArcPath, HdfName, product, startdate, enddate, tileH, tileV, extent, collection, dlmethod="auto", quiet=FALSE, wait=1, checkSize=FALSE, log=TRUE)}
 
 \arguments{
 
@@ -27,8 +27,6 @@
 
   \item{product}{Character. (Ignored if \code{HdfName} is provided.) MODIS grid product to be downloaded. For 'MODIS TERRA Vegetation Indices at 250 m ground resolution' use: \code{MOD13Q1}. For vegetation indices from TERRA and AQUA use \code{MxD13Q1}. See \url{https://lpdaac.usgs.gov/lpdaac/products/modis_products_table} for more Products.}   
     
-  \item{collection}{Character or integer. (Ignored if \code{HdfName} is provided.) Refers to the MODIS product collection-version. Often '005', but see MODIS pages for more information.}
- 
   \item{startdate}{Character. (Ignored if \code{HdfName} is provided.) Subset start date of MODIS time series (format: "YYYY.MM.DD").}
 
   \item{enddate}{Character. (Ignored if \code{HdfName} is provided.) Subset end date of MODIS time series (format: "YYYY.MM.DD"). Can be a future date, for continuous update in a schedule job.}
@@ -38,7 +36,11 @@
   \item{tileV}{Character vector. (Ignored if \code{HdfName} is provided.) Vertical tile number(s) (between 0 and 17). I.e.: \code{tileV = 9:17}.}
 
   \item{extent}{see \code{'extent'} in \code{?getTILE}.}
- 
+
+  \item{collection}{Character or integer. (Ignored if \code{HdfName} is provided.) Refers to the MODIS product collection-version. Often '005', but see MODIS pages for more information.} 
+
+  \item{dlmethod}{Default \code{auto}. Argument passed to \code{?download.file}}
+
   \item{checkSize}{Logical. Default \code{FALSE}, MODIS-XML files are not downloaded with their MODIS-HDF file and a "checkSum" is not done. If \code{TRUE} MODIS-HDF and corresponding MODIS-XML files are checked and downloaded and the filesize is checked. (!keep FALSE for now!)}
     
   \item{wait}{Numeric. Default \code{1}. Inserts a break (in seconds) after every internal \code{download.file()} or \code{getURL()} call. It reduces the chance of FTP connection error that often occurs after many requests. Requires the 'audio' package. (Hopefully a temporary solution!)}
@@ -61,18 +63,22 @@
 }
 
 \examples{
+\dontrun{
 # one spezific file (no regular erpression allowed here for now!)
-# getHDF(HdfName="MOD13Q1.A2009209.h19v04.005.2009227222141.hdf", wait=0)
+getHDF(HdfName="MOD13Q1.A2009209.h19v04.005.2009227222141.hdf", wait=0)
 
 # DO NOT RUN THE NEXT EXAMPLE (unless you need this data)!!!
 # Get all MODIS TERRA 13Q1 beginning from 01. January 2009 up to today.
 # If run in a scheduled batch job it will update the data until end of 2015.
-# getHDF(product="MOD13Q1",collection=5,startdate="2009.01.01",enddate="2015.12.31",tileH=19,tileV=4:5) 
+getHDF(product="MOD13Q1",startdate="2009.01.01",enddate="2015.12.31",tileH=19,tileV=4:5) 
 
 # or the same with an (list) Extent
-# Austria <- list(lat_min=46.12,lat_max=49.3,lon_max=17.47,lon_min=9.2)
-# getHDF(product="MYD13Q1",collection=5,startdate="2009.01.01",enddate="2015.12.31",extent=Austria)
+Austria <- list(lat_min=46.12,lat_max=49.3,lon_max=17.47,lon_min=9.2)
+getHDF(product="MYD13Q1",startdate="2009.01.01",enddate="2015.12.31",extent=Austria)
 
+# require(mapdata)
+getHDF(product="MYD13Q1",startdate="2009.01.01",enddate="2015.12.31",extent="austria")
+}
 }
 
 
