@@ -194,10 +194,12 @@ if (sum(mtr)!=0) { # if one or more of the tiles in date is missing, its necessa
 	
 		for(j in 1:ntiles){
 		
-			if(mtr[j]==1){ # if tile is missing get it
+		if(mtr[j]==1){ # if tile is missing get it
 			onFtp <- grep(ftpfiles,pattern=dates[[z]][i,j+1],value=TRUE)
 			HDF   <- grep(onFtp,pattern=".hdf$",value=TRUE)
-		
+
+			if(length(HDF)>0){
+					
 				if (length(HDF)>1) { # in very recent files sometimes there is more than 1 file/tile/date if so get the last
 				select <- list()
 				for (d in 1:length(HDF)){
@@ -209,7 +211,11 @@ if (sum(mtr)!=0) { # if one or more of the tiles in date is missing, its necessa
 			hdf <- download.file(paste(ftp, dates[[z]][i,1], "/", HDF,sep=""), destfile=paste(arcPath, HDF, sep=""), mode='wb', method=dlmethod, quiet=quiet, cacheOK=FALSE)
 			mtr[j] <- hdf
 				if (wait > 0){wait(as.numeric(wait))}
+			} else { 
+				dates[[z]][i,j+1] <- "No tile for location" 
 			}
+		} # if mtr==1
+	
 		}
 	} else {
 	dates[[z]][i,(j+1):ncol(dates[[z]])] <- "No files for that date on FTP"
@@ -223,10 +229,10 @@ if (log) {
 	
 if(checkSize){
 	xml <-  getXML(HdfName = list(paste(arcPath,dates[[z]][i,-1],sep="")),wait=wait,quiet=quiet)
-	} # list() should not be needed
+	} # list() should not be needed but but but...
 
 l=l+1
-output[[l]] <- paste(arcPath,dates[[z]][i,-1],sep="")
+output[[l]] <- paste(arcPath,grep(dates[[z]][i,-1],pattern=".hdf$",value=TRUE),sep="")
 } # end dates i 
 }else{
 #		if (!quiet){

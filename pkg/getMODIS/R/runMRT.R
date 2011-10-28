@@ -99,7 +99,7 @@ if (!exists("collection")) {
 # getSTRUC garants that all needed dir structure information is made avalable offline
 ftpdirs <- getSTRUC(product=product$request,collection=collection,startdate=startdate,enddate=enddate)
 
-######################## along platform
+######################## along platform (TerraAqua)
 for(i in 1:length(product$PF1)) { 
 
 avDates <- ftpdirs[,colnames(ftpdirs)==paste(product$productName[i],".",collection,sep="")]
