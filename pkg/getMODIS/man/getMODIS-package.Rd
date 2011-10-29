@@ -27,7 +27,7 @@ MODIS data pool home page with list of data access possibilities: \url{https://l
 MODIS data pool server: \url{ftp://e4ftl01.cr.usgs.gov/}\cr
 MODIS home page: \url{http://modis.gsfc.nasa.gov/}\cr
 
-A great thanks to Tomislav Hengel. 'getMODIS' has its origin in his code see: \url{http://spatial-analyst.net/wiki/index.php?title=Download_and_resampling_of_MODIS_images}.
+A great thanks to Tomislav Hengl. 'getMODIS' has its origin in his code see: \url{http://spatial-analyst.net/wiki/index.php?title=Download_and_resampling_of_MODIS_images}.
 
 }
 
