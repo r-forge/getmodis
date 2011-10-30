@@ -50,17 +50,21 @@ getTILE(extent=Austria)
 # with Extent or raster* object from raster package
 require(raster)
 
-rasterObject <- raster(xmn=9.2,xmx=17.47,ymn=46.12,ymx=49.3)
 # rasterObject
+rasterObject <- raster(xmn=9.2,xmx=17.47,ymn=46.12,ymx=49.3)
 getTILE(extent=rasterObject)
 
-ext <- extent(rasterObject)
 # raster extent
+ext <- extent(rasterObject)
 getTILE(extent=ext)
 
 # require(mapdata)
-getTILE(extent="austria")
+# if you pass a character name to extent a standard call to 'map()' is performed.
+getTILE(extent="usa")
 
+# if you want subsets or more detailed maps use ?map arguments 
+ext <-  map('state', region = c('new york', 'new jersey', 'penn'))
+getTILE(extent=ext)
 }
 
 

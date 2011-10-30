@@ -5,16 +5,13 @@
 \alias{getXML}
 \alias{getXML, LocalArcPath, HdfName, wait, quiet}
 
-\title{Mirroring corresponding xml-metadata-files for any MODIS-grid-hdf
-  files in the query.}
+\title{Function that checks the integrity of MODIS-grid-hdf files in the query.}
 
 \description{
   Each MODIS HDF file has a xml-metafile. This data contains usefull
   information about each MODIS-hdf file. Within that package, the
   xml-files are used to check the size of the downloaded hdf files, and
-  correcting the so often broken downloads from the MODIS online
-  archive. getXML checks locally for the presence of spezified xml files
-  and if not available it retrieves them from the MODIS ftp server.
+  correcting the so often broken downloads. 'getXML' checks locally for the presence of spezified xml files and if not available it retrieves them from the MODIS ftp server.
 }
 
 \usage{
@@ -60,13 +57,15 @@ getXML(LocalArcPath,HdfName,checkSize=TRUE,wait=1,quiet=FALSE)
 }
 
 \examples{
-# checks all HDF files under path="." for the XML-file
-# getXML()
+\dontrun{
+# checks all HDF files under path="." for the XML-file and size
+getXML()
 
 # check all MODIS Terra Vegetation Indices 250 m (13Q1) under "."
-# getXML(HdfName="MOD13Q1*")
+getXML(HdfName="MOD13Q1*")
 
-# checks the XML file availability for a single file
-# getXML(HdfName="MYD09GA.A2011002.h19v05.005.2011007211429.hdf")
+# check for a single file
+getXML(HdfName="MYD09GA.A2011002.h19v05.005.2011007211429.hdf")
+}
 }
 

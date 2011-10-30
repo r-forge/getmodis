@@ -16,11 +16,11 @@ extent <- list(lat_min=min(extent$range[3:4]),lat_max=max(extent$range[3:4]),lon
 
 if (inherits(extent,"character")){
 require(mapdata)
-try(test <- map('worldHires',extent,plot=FALSE),silent=TRUE)
+try(test <- map(extent,plot=FALSE),silent=TRUE) # for error handling
 	if (exists("test")){
-		extent  <- map('worldHires',extent,plot=FALSE)
+		extent  <- map(extent,plot=FALSE)
 	} else {
-		stop(paste("Country name not found. Check availability/spelling in the 'mapdata' package i.e.: map('wolrdHighres','",extent,"')",sep=""))
+		stop(paste("Country name not valid. Check availability/spelling, i.e. try: map('",extent,"')",sep=""))
 	}
 extent <- list(lat_min=min(extent$range[3:4]),lat_max=max(extent$range[3:4]),lon_min=min(extent$range[1:2]),lon_max=max(extent$range[1:2]))
 }
@@ -36,7 +36,7 @@ extent <- list(lat_min=extent@ymin,lat_max=extent@ymax,lon_min=extent@xmin,lon_m
 }
 ####################################
 # extent class "list"
-if (inherits(extent,"list")){ # if it did exist it should have biéen changed to a list!
+if (inherits(extent,"list")){ # if it did exist it should have been changed to a list!
 
 if(length(extent$extent)==4) {extent<-extent$extent}
 

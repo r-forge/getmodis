@@ -30,8 +30,10 @@
 }
 
 \examples{
-# getSDS(HdfName="XXX")
-# getSDS(HdfName="/path/XXX")
+\dontrun{
+getSDS(HdfName="XXX")
+getSDS(HdfName="/path/XXX")
+}
 }
 
 
