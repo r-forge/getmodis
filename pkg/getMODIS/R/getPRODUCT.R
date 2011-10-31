@@ -4,20 +4,20 @@
 
 getPRODUCT <- function(product,quiet=TRUE){
 
-# if product is already a result of getPRODUCT turn it bach to the original request.
+# if product is already a result of getPRODUCT turn it back to the original request.
 if (is.list(product) && names(product) %in% c("request","PF1","PF2","PD","raster_type","productName")) { # matching with class should be done here!
 	product <- product$request
 	} 
 
+product <- toupper(product)
 # Check Platform and product
-PF <- substr(product,2,2)
+PF <- substr(product,1,3)
 
-#TODO if MCD, PF1 == "MOTA")
-if        (PF %in% c("x","X")) { PF1  <- c("MOLT", "MOLA"); PF2  <- c("MOD", "MYD") 
-} else if (PF %in% c("y","Y")) { PF1  <- "MOLA"; PF2 <- "MYD"
-} else if (PF %in% c("o","O")) { PF1  <- "MOLT"; PF2 <- "MOD"
-} else if (PF %in% c("c","C")) { PF1  <- "MOTA"; PF2 <- "MCD"
-} else {stop("Check 'product', the Platform specific part seams wrong.\n",PF,"\n Not one of 'MOD','MYD','MXD','MCD'.")
+if        (PF == "MXD") { PF1  <- c("MOLT", "MOLA"); PF2  <- c("MOD", "MYD") 
+} else if (PF == "MYD") { PF1  <- "MOLA"; PF2 <- "MYD"
+} else if (PF == "MOD") { PF1  <- "MOLT"; PF2 <- "MOD"
+} else if (PF == "MCD") { PF1  <- "MOTA"; PF2 <- "MCD"
+} else {stop("Check 'product', the platform specific part seams wrong.\n",PF,"is not one of 'MOD','MYD','MXD','MCD'.")
 }
 
 # Check product
@@ -27,14 +27,14 @@ PD <- substr(product,4,nchar(product)) #'09Q1',...
 data("MODIS_Products")
 
 productName <- list()
-# validy check and information
+# vality check and information
 for (i in 1:length(PF2)){
 
-	if (paste(PF2[i],PD,sep="") %in% MODIS_Products[,1]) {
-	ind <- which(MODIS_Products[,1] == paste(PF2[i],PD,sep=""))
+	if (length(grep(MODIS_Products[,1],pattern=paste("^",PF2[i],PD,"$",sep="")))==1) {
+	ind <- grep(MODIS_Products[,1],pattern=paste("^",PF2[i],PD,"$",sep=""))
 	productName[[i]] <- MODIS_Products[ind,1]
 	
-if(as.character(MODIS_Products[ind,4])=="Swath"){stop(paste("You are looking for a '",as.character(MODIS_Products[ind,4]),"' product, only 'tile' data is supported yet!",sep=""))
+if(as.character(MODIS_Products[ind,4])=="Swath"){stop(paste("You are looking for a '",as.character(MODIS_Products[ind,4]),"' product, only 'Grid' data is supported yet!",sep=""))
 		} else { 
 			if (!quiet){
 				if(i == 1){cat("\n")} else {cat("and\n")}
@@ -42,7 +42,7 @@ if(as.character(MODIS_Products[ind,4])=="Swath"){stop(paste("You are looking for
 			}
 		}
 	} else {
-	cat(paste("No product found with the name ",PF2[i],PD,sep=""))}
+	cat(paste("No product found with the name ",PF2[i],PD,"\n",sep=""))}
 }
 if (!quiet){cat("\n")}
 

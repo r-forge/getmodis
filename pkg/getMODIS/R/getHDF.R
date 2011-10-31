@@ -23,6 +23,8 @@ dir.create(LocalArcPath,showWarnings=FALSE)
 # test local LocalArcPath
 try(testDir <- list.dirs(LocalArcPath),silent=TRUE)
 if(!exists("testDir")) {stop("'LocalArcPath' not set properly!")} 
+
+auxPATH <- file.path(LocalArcPath,".auxiliaries",fsep=fsep)
 #################
 
 # TODO HdfName as regex
@@ -78,7 +80,7 @@ dates[[i]] <- paste(LocalArcPath,fsep,arcPath,HdfName[i],sep="")
 	}
 invisible(unlist(dates))
 
-} else { # if HdfName is'nt provided:
+} else { # if HdfName isn't provided:
 
 if (missing(startdate)) {stop("Please provide a 'startdate' (format: 'YYYY.MM.DD')")} 
 if (missing(enddate))   {stop("Please provide a 'endate' (format: 'YYYY.MM.DD')")} 
@@ -118,7 +120,6 @@ if (substr(product$PD,3,nchar(product$PD))=="CMG") {
 	ntiles <- length(tileID)
 }
 
-auxPATH <- file.path(LocalArcPath,".auxiliaries",fsep=fsep)
 
 dates  <- list()
 output <- list() # path info for the invisible output
