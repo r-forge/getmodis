@@ -59,9 +59,10 @@ ext <- extent(rasterObject)
 getTILE(extent=ext)
 
 # require(mapdata)
-# if you pass a character name to extent a standard call to 'map()' is performed.
+# if you pass a character name to the extent option a standard call to 'map('worldHires',extent,plot=FALSE)' is performed.
+# Use with caution! The following example includes much more areas than the main USA. Look at "map('worldHires','usa')" result.  
 getTILE(extent="usa")
-
+# so you better always check befor applying an extent of the class 'character' that defines a 'map' object
 # if you want subsets or more detailed maps use ?map arguments 
 ext <-  map('state', region = c('new york', 'new jersey', 'penn'))
 getTILE(extent=ext)

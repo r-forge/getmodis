@@ -16,11 +16,11 @@ extent <- list(lat_min=min(extent$range[3:4]),lat_max=max(extent$range[3:4]),lon
 
 if (inherits(extent,"character")){
 require(mapdata)
-try(test <- map(extent,plot=FALSE),silent=TRUE) # for error handling
+try(test <- map("worldHires",extent,plot=FALSE),silent=TRUE) # for error handling
 	if (exists("test")){
-		extent  <- map(extent,plot=FALSE)
+		extent  <- map("worldHires",extent,plot=FALSE)
 	} else {
-		stop(paste("Country name not valid. Check availability/spelling, i.e. try: map('",extent,"')",sep=""))
+		stop(paste("Country name not valid. Check availability/spelling, i.e. try if it works with: map('worldHires',',",extent,"')",sep=""))
 	}
 extent <- list(lat_min=min(extent$range[3:4]),lat_max=max(extent$range[3:4]),lon_min=min(extent$range[1:2]),lon_max=max(extent$range[1:2]))
 }
